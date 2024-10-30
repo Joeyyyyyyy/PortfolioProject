@@ -12,6 +12,7 @@ def home():
 
 @app.route("/api/held_stocks", methods=["GET"])
 def get_held_stocks():
+    portfolio.run()
     held_stocks = portfolio.getHeldStocks()
     if held_stocks is not None:
         return jsonify(held_stocks.to_dict(orient="records"))
@@ -19,6 +20,7 @@ def get_held_stocks():
 
 @app.route("/api/profit", methods=["GET"])
 def get_profit():
+    portfolio.run()
     realized_profit = portfolio.getRealisedProfit()
     return jsonify({"realized_profit": realized_profit})
 

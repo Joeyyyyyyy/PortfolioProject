@@ -8,7 +8,7 @@ function fetchRealizedProfit() {
     fetch("/api/profit")
         .then(response => response.json())
         .then(data => {
-            document.getElementById("realized-profit").textContent = `$${data.realized_profit.toFixed(2)}`;
+            document.getElementById("realized-profit").textContent = `${data.realized_profit.toFixed(2)}`;
         })
         .catch(error => console.error("Error fetching realized profit:", error));
 }
@@ -25,9 +25,9 @@ function fetchHeldStocks() {
                     <td>${stock.Share}</td>
                     <td>${stock.Symbol}</td>
                     <td>${stock["Net Shares"]}</td>
-                    <td>$${stock["Current Price"].toFixed(2)}</td>
-                    <td>$${stock["Potential Sale Value"].toFixed(2)}</td>
-                    <td>$${stock["Potential Sale Profit/Loss"].toFixed(2)}</td>
+                    <td>${stock["Current Price"].toFixed(2)}</td>
+                    <td>${stock["Potential Sale Value"].toFixed(2)}</td>
+                    <td>${stock["Potential Sale Profit/Loss"].toFixed(2)}</td>
                 `;
                 tbody.appendChild(row);
             });
