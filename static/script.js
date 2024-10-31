@@ -34,3 +34,23 @@ function fetchHeldStocks() {
         })
         .catch(error => console.error("Error fetching held stocks:", error));
 }
+
+      // Scroll to the table section 
+      document.addEventListener('DOMContentLoaded', function() {
+        const getStartedButton = document.querySelector('#button1');
+        const servicesLink = document.querySelector('a[href="#portfolio-section"]');
+    
+        getStartedButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            const targetSection = document.querySelector('#portfolio-section');
+    
+            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+        });
+    
+        servicesLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            const targetSection = document.querySelector('#portfolio-section');
+    
+            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+        });
+    });
