@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request, render_template
 from StockPortfolio import StockPortfolio
+import os
 
 class StockPortfolioAPI:
     def __init__(self, file_path="TransactionDeets.xlsx"):
@@ -43,11 +44,12 @@ class StockPortfolioAPI:
             realized_profit = self.portfolio.getRealisedProfit()
             return jsonify({"realized_profit": realized_profit})
 
-    def run(self, debug=True):
-        self.app.run(debug=debug)
+    def run(self, debug=True, host="127.0.0.1", port=5000):
+        self.app.run(debug=debug,host=host,port=port)
 
 
 # To run the API
 if __name__ == "__main__":
     api = StockPortfolioAPI()
-    api.run(debug=False)
+    port = int(os.environ.get("PORT", 5000))
+    api.run(debug=False,host="0.0.0.0", port=port)
