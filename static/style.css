@@ -1,24 +1,48 @@
 /* static/style.css */
-body {
-    font-family: Arial, sans-serif;
+html, body {
+    height: 100%;
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
+    background-color: black;
 }
 
-.container {
+body {
+    display: flex;
+    flex-direction: column;
+}
+#hero-section {
+    height: 100vh;
+}
+
+
+/*.container {
     width: 80%;
     margin: 0 auto;
     padding: 20px;
-}
-
-h1 {
-    color: #333;
-}
+} */
 
 #portfolio-table th,
 #portfolio-table td {
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
-    padding-left: 2.5rem; /* equivalent to 10 on Tailwind's scale */
+    padding-left: 2.5rem;
     padding-right: 2.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+#soldTable th,
+#soldTable td {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    padding-left: 2.5rem; 
+    padding-right: 2.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+#tableSections {
+    background-color: #333;
+}
+.container{
+    background-color: #a2a2a2;
 }

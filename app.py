@@ -13,6 +13,14 @@ class StockPortfolioAPI:
         def home():
             return render_template("index.html")
 
+        @self.app.route("/stockDisplay")
+        def stock_display():
+            return render_template("stockDisplay.html")
+        
+        @self.app.route('/')
+        def index():
+            return render_template('index.html')
+
         @self.app.route("/api/held_stocks", methods=["GET"])
         def get_held_stocks():
             self.portfolio.run()
