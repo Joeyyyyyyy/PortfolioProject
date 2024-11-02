@@ -2,6 +2,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     fetchRealizedProfit();
     fetchHeldStocks();
+    fetchSoldStocks();
 });
 
 function fetchRealizedProfit() {
@@ -35,22 +36,28 @@ function fetchHeldStocks() {
         .catch(error => console.error("Error fetching held stocks:", error));
 }
 
-      // Scroll to the table section 
-      document.addEventListener('DOMContentLoaded', function() {
-        const getStartedButton = document.querySelector('#button1');
-        const servicesLink = document.querySelector('a[href="#portfolio-section"]');
-    
-        getStartedButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            const targetSection = document.querySelector('#portfolio-section');
-    
-            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
-        });
-    
-        servicesLink.addEventListener('click', function(event) {
-            event.preventDefault();
-            const targetSection = document.querySelector('#portfolio-section');
-    
-            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
-        });
-    });
+function fetchSoldStocks() {
+    fetch("/api/sold_stocks")
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById("soldTable").getElementsByTagName("tbody")[0];
+            tbody.innerHTML = ""; // Clear existing rows
+            data.forEach(stock => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${stock["Transaction ID"]}</td>
+                    <td>${stock["Stock Code"]}</td>
+                    <td>${stock["Shares Sold"]}</td>
+                    <td>${parseFloat(stock["Sell Price (per share)"]).toFixed(2)}</td>
+                    <td>${parseFloat(stock["Avg Buy Price"]).toFixed(2)}</td>
+                    <td>${parseFloat(stock["Total Buy Value"]).toFixed(2)}</td>
+                    <td>${parseFloat(stock["Total Sell Value"]).toFixed(2)}</td>
+                    <td>${parseFloat(stock["Profit/Loss"]).toFixed(2)}</td>
+                    <td>${new Date(stock["Sell Date"]).toLocaleDateString()}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => console.error("Error fetching sold stocks:", error));
+}
+
