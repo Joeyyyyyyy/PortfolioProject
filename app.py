@@ -50,4 +50,4 @@ class StockPortfolioAPI:
 # To run the API
 if __name__ == "__main__":
     api = StockPortfolioAPI()
-    api.run()
+    api.run(debug=False)
