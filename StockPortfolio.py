@@ -77,20 +77,20 @@ class StockPortfolio:
         total_sell_revenue = self.df[self.df['Transaction'] == 'Sell']['Total Amount'].sum()
         self.overall_profit_loss = total_sell_revenue - total_buy_cost + self.net_holdings_buying_price
 
-    def retrieve_current_prices(self):
+    def retrieve_current_prices(self, mode:str = 'held_stocks'):
         """Retrieve the current prices for held stocks using yfinance."""
         print("Retrieving current stock prices....")
+        if(mode == 'held_stocks'):
+            def get_current_price(ticker):
+                try:
+                    stock = yf.Ticker(ticker)
+                    current_price = stock.history(period='1d')['Close'].iloc[-1]
+                    return current_price
+                except Exception:
+                    return None
 
-        def get_current_price(ticker):
-            try:
-                stock = yf.Ticker(ticker)
-                current_price = stock.history(period='1d')['Close'].iloc[-1]
-                return current_price
-            except Exception:
-                return None
-
-        self.held_stocks = self.net_holdings[self.net_holdings['Net Shares'] > 0].copy()
-        self.held_stocks['Current Price'] = self.held_stocks['Symbol'].apply(get_current_price)
+            self.held_stocks = self.net_holdings[self.net_holdings['Net Shares'] > 0].copy()
+            self.held_stocks['Current Price'] = self.held_stocks['Symbol'].apply(get_current_price)
 
     def calculate_potential_sale_values(self):
         """Calculate potential sale values and profit/loss for held stocks."""
@@ -194,11 +194,11 @@ class StockPortfolio:
         })
 
         # Format monetary columns to 2 decimal places with commas for readability and real numbers like indices to int
-        realised_df['Sell Price (per share)'] = realised_df['Sell Price (per share)'].map('{:,.2f}'.format)
-        realised_df['Total Sell Value'] = realised_df['Total Sell Value'].map('{:,.2f}'.format)
-        realised_df['Avg Buy Price'] = realised_df['Avg Buy Price'].map('{:,.2f}'.format)
-        realised_df['Total Buy Value'] = realised_df['Total Buy Value'].map('{:,.2f}'.format)
-        realised_df['Profit/Loss'] = realised_df['Profit/Loss'].map('{:,.2f}'.format)
+        realised_df['Sell Price (per share)'] = realised_df['Sell Price (per share)']
+        realised_df['Total Sell Value'] = realised_df['Total Sell Value']
+        realised_df['Avg Buy Price'] = realised_df['Avg Buy Price']
+        realised_df['Total Buy Value'] = realised_df['Total Buy Value']
+        realised_df['Profit/Loss'] = realised_df['Profit/Loss']
         realised_df['Transaction ID'] = realised_df['Transaction ID'].round().astype(int)
         realised_df['Shares Sold'] = realised_df['Shares Sold'].round().astype(int)
 
@@ -213,7 +213,7 @@ class StockPortfolio:
 
 
 
-    def display_results(self):
+    def display_results(self): 
         """Display the overall profit/loss and held stocks with potential sale values."""
         print(f"\nRealised Profit: {self.overall_profit_loss:.2f}\n")
         print("Held stocks with potential sale values and profit/loss:\n")
