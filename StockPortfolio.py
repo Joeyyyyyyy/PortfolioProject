@@ -112,6 +112,7 @@ class StockPortfolio:
         consisting of the average price at which it was bought, profit/loss made in each transaction,
         and the price at which it was sold.
         """
+        print("Computing realised returns data....")
         sell = self.sold_stocks
         realised_data = []  # List to store results for each sell transaction
         
