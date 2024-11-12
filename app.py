@@ -1,29 +1,66 @@
 from flask import Flask, jsonify, request, render_template
 from StockPortfolio import StockPortfolio
 import os
+from typing import Optional
 
 class StockPortfolioAPI:
-    def __init__(self, file_path="TransactionDeets.xlsx"):
-        self.app = Flask(__name__)
-        self.portfolio = StockPortfolio(file_path=file_path)
+    def __init__(self, file_path: str) -> None:
+        """
+        Initialize the StockPortfolioAPI instance.
+
+        Args:
+            file_path (str): The path to the file containing stock portfolio data.
+        """
+        self.app: Flask = Flask(__name__)
+        self.portfolio: StockPortfolio = StockPortfolio(file_path=file_path)
         self.portfolio.run()  # Pre-calculate values for fast access
+        self.api_key: str = "joel09022024Adh"  # Hardcoded API key
         self.setup_routes()   # Initialize all routes
 
-    def setup_routes(self):
+    def setup_routes(self) -> None:
+        """
+        Set up the routes for the Flask app.
+        """
         @self.app.route("/")
-        def home():
+        def home() -> str:
+            """
+            Render the home page.
+
+            Returns:
+                str: HTML content for the home page.
+            """
             return render_template("index.html")
 
         @self.app.route("/stockDisplay")
-        def stock_display():
+        def stock_display() -> str:
+            """
+            Render the stock display page.
+
+            Returns:
+                str: HTML content for the stock display page.
+            """
             return render_template("stockDisplay.html")
         
         @self.app.route('/')
-        def index():
+        def index() -> str:
+            """
+            Render the index page.
+
+            Returns:
+                str: HTML content for the index page.
+            """
             return render_template('index.html')
 
         @self.app.route("/api/held_stocks", methods=["GET"])
-        def get_held_stocks():
+        def get_held_stocks() -> tuple:
+            """
+            Get the list of held stocks in the portfolio.
+
+            Returns:
+                tuple: JSON response with held stocks data or error message.
+            """
+            if not self.is_authorized(request):
+                return jsonify({"error": "Unauthorized"}), 403
             self.portfolio.run()
             held_stocks = self.portfolio.getHeldStocks()
             if held_stocks is not None:
@@ -31,7 +68,15 @@ class StockPortfolioAPI:
             return jsonify({"error": "No held stocks data available"}), 404
 
         @self.app.route("/api/sold_stocks", methods=["GET"])
-        def get_sold_stocks():
+        def get_sold_stocks() -> tuple:
+            """
+            Get the list of sold stocks in the portfolio.
+
+            Returns:
+                tuple: JSON response with sold stocks data or error message.
+            """
+            if not self.is_authorized(request):
+                return jsonify({"error": "Unauthorized"}), 403
             self.portfolio.run()
             sold_stocks = self.portfolio.getSoldStocksData()
             if sold_stocks is not None:
@@ -39,17 +84,46 @@ class StockPortfolioAPI:
             return jsonify({"error": "No sold stocks data available"}), 404
 
         @self.app.route("/api/profit", methods=["GET"])
-        def get_profit():
+        def get_profit() -> tuple:
+            """
+            Get the realized profit from the portfolio.
+
+            Returns:
+                tuple: JSON response with the realized profit or error message.
+            """
+            if not self.is_authorized(request):
+                return jsonify({"error": "Unauthorized"}), 403
             self.portfolio.run()
             realized_profit = self.portfolio.getRealisedProfit()
             return jsonify({"realized_profit": realized_profit})
 
-    def run(self, debug=True, host="127.0.0.1", port=5000):
-        self.app.run(debug=debug,host=host,port=port)
+    def is_authorized(self, request) -> bool:
+        """
+        Check if the request contains the correct API key.
+
+        Args:
+            request : The Flask request object.
+
+        Returns:
+            bool: True if authorized, False otherwise.
+        """
+        api_key: Optional[str] = request.headers.get("x-api-key")
+        return api_key == self.api_key
+
+    def run(self, debug: bool = True, host: str = "127.0.0.1", port: int = 5000) -> None:
+        """
+        Run the Flask app.
+
+        Args:
+            debug (bool): Whether to run the app in debug mode.
+            host (str): The hostname to listen on.
+            port (int): The port of the web server.
+        """
+        self.app.run(debug=debug, host=host, port=port)
 
 
 # To run the API
 if __name__ == "__main__":
-    api = StockPortfolioAPI()
-    port = int(os.environ.get("PORT", 8000))
-    api.run(debug=False,host="0.0.0.0", port=port)
+    api = StockPortfolioAPI(file_path="TransactionDeets.xlsx")
+    port: int = int(os.environ.get("PORT", 8000))
+    api.run(debug=True, host="0.0.0.0", port=port)
