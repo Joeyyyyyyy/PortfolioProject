@@ -13,7 +13,7 @@ body {
   justify-content: center;
   height: 100vh;
   font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
+  background-color: rgb(17, 24, 40);
   color: #333;
 }
 
@@ -21,7 +21,7 @@ body {
   width: 100%;
   max-width: 400px;
   padding: 2rem;
-  background-color: #fff;
+  background-color: #202938;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   text-align: center;
@@ -30,7 +30,7 @@ body {
 h2 {
   font-size: 2rem;
   margin-bottom: 1rem;
-  color: #333;
+  color: #66a845;
 }
 
 .input-group {
@@ -42,7 +42,12 @@ label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
-  color: #555;
+  color: #fff;
+}
+
+#username, #password{
+    background-color: #4a5a6a; 
+    color: white
 }
 
 input[type="text"],
@@ -71,7 +76,7 @@ input[type="password"] {
 .login-button {
   width: 100%;
   padding: 0.75rem;
-  background-color: #333;
+  background-color: #3a755c;
   color: #fff;
   font-size: 1rem;
   border: none;
@@ -81,16 +86,17 @@ input[type="password"] {
 }
 
 .login-button:hover {
-  background-color: #555;
+  background-color: #66a845;
 }
 
 .footer-text {
   margin-top: 1.5rem;
   font-size: 0.9rem;
+  color: #819eb3;
 }
 
 .footer-text a {
-  color: #333;
+  color: #819eb3;
   text-decoration: none;
   font-weight: bold;
 }
@@ -99,9 +105,33 @@ input[type="password"] {
   text-decoration: underline;
 }
 
+.footer {
+    text-align: center;
+    padding: 20px;
+    color: #798fb1;
+    font-size: 14px;
+    background-color: #202938;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+  }
+
+.footer a {
+    color: #798fb1;
+    text-decoration: none;
+  }
+
+.footer a:hover {
+    text-decoration: underline;
+  }
+
 /* Responsive design */
 @media (max-width: 400px) {
   .login-container {
     padding: 1.5rem;
+  }
+  .footer {
+    font-size: 12px;
+    padding: 15px; 
   }
 }
