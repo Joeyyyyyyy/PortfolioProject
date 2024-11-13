@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, redirect, url_for, session, flash
 from StockPortfolio import StockPortfolio
 import os
 from typing import Optional
@@ -12,10 +12,11 @@ class StockPortfolioAPI:
             file_path (str): The path to the file containing stock portfolio data.
         """
         self.app: Flask = Flask(__name__)
+        self.app.secret_key = "your_secret_key_here"  # Required for session management
         self.portfolio: StockPortfolio = StockPortfolio(file_path=file_path)
         self.portfolio.run()  # Pre-calculate values for fast access
         self.api_key: str = "joel09022024Adh"  # Hardcoded API key
-        self.setup_routes()   # Initialize all routes
+        self.setup_routes()  # Initialize all routes
 
     def setup_routes(self) -> None:
         """
@@ -23,6 +24,16 @@ class StockPortfolioAPI:
         """
         @self.app.route("/")
         def home() -> str:
+            """
+            Render the home page.
+
+            Returns:
+                str: HTML content for the home page.
+            """
+            return render_template("index.html")
+        
+        @self.app.route("/")
+        def index() -> str:
             """
             Render the home page.
 
@@ -39,17 +50,40 @@ class StockPortfolioAPI:
             Returns:
                 str: HTML content for the stock display page.
             """
+            if "user" not in session:
+                flash("Please log in to access this page.")
+                return redirect(url_for("login"))
             return render_template("stockDisplay.html")
-        
-        @self.app.route('/')
-        def index() -> str:
-            """
-            Render the index page.
 
-            Returns:
-                str: HTML content for the index page.
+        @self.app.route("/login", methods=["GET", "POST"])
+        def login() -> str:
             """
-            return render_template('index.html')
+            Handle login form submission and render login page.
+            """
+            if request.method == "POST":
+                username = request.form.get("username")
+                password = request.form.get("password")
+                
+                #print(username+" "+password)
+
+                # Authentication logic (Replace with real authentication)
+                if username == "user" and password == "password":  # Example credentials
+                    session["user"] = username
+                    return redirect(url_for("stock_display"))
+                else:
+                    session.pop("user", None)
+                    flash("Invalid username or password")
+                    return redirect(url_for("login"))
+            return render_template("login.html")
+
+        @self.app.route("/logout")
+        def logout() -> str:
+            """
+            Clear the session and log the user out.
+            """
+            session.pop("user", None)
+            flash("You have been logged out.")
+            return redirect(url_for("home"))
 
         @self.app.route("/api/held_stocks", methods=["GET"])
         def get_held_stocks() -> tuple:
