@@ -4,7 +4,7 @@ import os
 from typing import Optional
 
 class StockPortfolioAPI:
-    def __init__(self, file_path: str) -> None:
+    def __init__(self, file_path: str = None, firebaseadmin = None) -> None:
         """
         Initialize the StockPortfolioAPI instance.
 
@@ -12,10 +12,11 @@ class StockPortfolioAPI:
             file_path (str): The path to the file containing stock portfolio data.
         """
         self.app: Flask = Flask(__name__)
-        self.app.secret_key = "your_secret_key_here"  # Required for session management
-        self.portfolio: StockPortfolio = StockPortfolio(file_path=file_path)
-        self.portfolio.run()  # Pre-calculate values for fast access
-        self.api_key: str = "joel09022024Adh"  # Hardcoded API key
+        self.app.secret_key = "secret_key"  # Required for session management
+        self.portfolio: StockPortfolio = StockPortfolio(file_path=file_path, dataframe=None)
+        if(file_path!=None):
+            self.portfolio.run()  # Pre-calculate values for fast access
+        self.api_key: str = "joel09-02-2024Adh"  # Hardcoded API key
         self.setup_routes()  # Initialize all routes
 
     def setup_routes(self) -> None:

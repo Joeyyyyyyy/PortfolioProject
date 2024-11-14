@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Define the API key to be included in headers
 /** @constant {string} API_KEY - API key for authorization in request headers */
-const API_KEY = "joel09022024Adh";
+const API_KEY = "joel09-02-2024Adh";
 
 /**
  * Fetches the realized profit data from the API and updates the page with the profit value.

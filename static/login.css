@@ -14,7 +14,7 @@ body {
   height: 100vh;
   font-family: Arial, sans-serif;
   background-color: rgb(17, 24, 40);
-  color: #333;
+  color: #819eb3;
 }
 
 .login-container {
@@ -95,14 +95,18 @@ input[type="password"] {
   color: #819eb3;
 }
 
-.footer-text a {
+#reg-link {
   color: #819eb3;
   text-decoration: none;
   font-weight: bold;
 }
 
-.footer-text a:hover {
+#reg-link:hover {
   text-decoration: underline;
+}
+
+#invalid-login {
+  color: rgba(255, 0, 0, 0)
 }
 
 .footer {
