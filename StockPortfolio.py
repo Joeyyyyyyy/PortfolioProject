@@ -2,7 +2,7 @@ import pandas as pd
 import yfinance as yf
 
 class StockPortfolio:
-    def __init__(self, file_path: str, sheet_name: str = 'Sheet1'):
+    def __init__(self, file_path: str = None , sheet_name: str = 'Sheet1', dataframe: pd.DataFrame = None):
         """
         Initialize the StockPortfolio class with the path to the Excel file.
         
@@ -11,7 +11,7 @@ class StockPortfolio:
         """
         self.file_path = file_path
         self.sheet_name = sheet_name
-        self.df = None
+        self.df = dataframe
         self.net_holdings = None
         self.buying_costs = None
         self.net_holdings_buying_price = None
@@ -20,15 +20,45 @@ class StockPortfolio:
         self.sold_stocks = None
         self.buys = None
 
-    def load_data(self):
+    def load_excel(self):
         """Load the transaction data from the Excel file."""
+        
+        if(self.file_path==None):
+            return None
+        
         print("Loading Portfolio data....")
         self.df = pd.read_excel(self.file_path, sheet_name=self.sheet_name, engine='openpyxl')
+        
         self.df['Date'] = pd.to_datetime(self.df['Date'])
         self.df['Net Shares'] = self.df.apply(
             lambda row: row['Count'] if row['Transaction'] == 'Buy' else -row['Count'], axis=1
         )
-        self.net_holdings = self.df.groupby(['Share', 'Symbol'])['Net Shares'].sum().reset_index()
+        net_holdings = self.df.groupby(['Share', 'Symbol'])['Net Shares'].sum().reset_index()
+        
+        return net_holdings
+    
+    def load_dataframe(self):
+        """Load the transaction data from the Database."""
+        
+        if(self.df==None):
+            return None
+        
+        # Dictionary for columns to rename
+        rename_columns = {
+            'Sl_No': 'Sl.No.',
+            'Total_Amount': 'Total Amount'
+        }
+
+        # Check if the DataFrame has the columns to rename and rename them if they exist
+        self.df.rename(columns={col: new_col for col, new_col in rename_columns.items() if col in self.df.columns}, inplace=True)
+        
+        self.df['Date'] = pd.to_datetime(self.df['Date'])
+        self.df['Net Shares'] = self.df.apply(
+            lambda row: row['Count'] if row['Transaction'] == 'Buy' else -row['Count'], axis=1
+        )
+        net_holdings = self.df.groupby(['Share', 'Symbol'])['Net Shares'].sum().reset_index()
+        
+        return net_holdings
 
     def calculate_total_buying_price(self):
         """
@@ -238,23 +268,39 @@ class StockPortfolio:
         Run the complete workflow of loading data, calculating buying price,
         computing profit/loss, retrieving current stock prices, and displaying results.
         """
-        self.load_data()
+        if self.file_path!=None:
+            self.net_holdings = self.load_excel()
+        elif self.df!=None:
+            self.net_holdings = self.load_dataframe()
+        else:
+            return False
+            
         self.calculate_total_buying_price()
         self.calculate_overall_profit_loss()
         self.retrieve_current_prices()
         self.calculate_potential_sale_values()
         self.display_results()
         
+        return True
+        
     def run(self):
         """
         Run the complete workflow of loading data, calculating buying price,
         computing profit/loss, retrieving current stock prices.
         """
-        self.load_data()
+        if self.file_path!=None:
+            self.net_holdings = self.load_excel()
+        elif self.df!=None:
+            self.net_holdings = self.load_dataframe()
+        else:
+            return False
+            
         self.calculate_total_buying_price()
         self.calculate_overall_profit_loss()
         self.retrieve_current_prices()
         self.calculate_potential_sale_values()
+        
+        return True
 
 # Example usage:
 if __name__ == "__main__":
