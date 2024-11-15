@@ -2,20 +2,21 @@ from flask import Flask, jsonify, request, render_template, redirect, url_for, s
 from StockPortfolio import StockPortfolio
 import os
 from typing import Optional
+from admin import StockTransactionManager
 
 class StockPortfolioAPI:
-    def __init__(self, file_path: str = None, firebaseadmin = None) -> None:
+    def __init__(self, file_path: str = None) -> None:
         """
         Initialize the StockPortfolioAPI instance.
 
         Args:
             file_path (str): The path to the file containing stock portfolio data.
         """
+        self.portfolio: StockPortfolio = None
+        self.file_path=file_path
+        
         self.app: Flask = Flask(__name__)
         self.app.secret_key = "secret_key"  # Required for session management
-        self.portfolio: StockPortfolio = StockPortfolio(file_path=file_path, dataframe=None)
-        if(file_path!=None):
-            self.portfolio.run()  # Pre-calculate values for fast access
         self.api_key: str = "joel09-02-2024Adh"  # Hardcoded API key
         self.setup_routes()  # Initialize all routes
 
@@ -62,7 +63,7 @@ class StockPortfolioAPI:
             Handle login form submission and render login page.
             """
             if request.method == "POST":
-                username = request.form.get("username")
+                username = request.form.get("username").strip()
                 password = request.form.get("password")
                 
                 #print(username+" "+password)
@@ -70,6 +71,12 @@ class StockPortfolioAPI:
                 # Authentication logic (Replace with real authentication)
                 if username == "user" and password == "password":  # Example credentials
                     session["user"] = username
+                    
+                    self.portfolio = StockPortfolio(file_path=self.file_path, dataframe=None)
+                    if(self.file_path!=None):
+                        self.portfolio.run()  # Pre-calculate values for fast access
+
+                    
                     return redirect(url_for("stock_display"))
                 else:
                     session.pop("user", None)

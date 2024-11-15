@@ -5,65 +5,115 @@ from dotenv import load_dotenv
 import os
 import pandas as pd
 from StockPortfolio import StockPortfolio
+from typing import Optional, Dict, Any, Union
 
 class StockTransactionManager:
     """A manager class for handling user accounts and stock transactions in Firebase Firestore."""
 
-    def __init__(self, service_account_path):
+    def __init__(self) -> None:
         """
         Initialize StockTransactionManager with Firebase credentials.
 
         Args:
-            service_account_path (str): Path to the Firebase service account JSON file.
+            service_account_path (Dict[str, str]): Firebase service account credentials as a dictionary.
         """
+        
+        load_dotenv()
+        # Store all variables in a single dictionary
+        service_account_path = {
+            "type": os.getenv("TYPE"),
+            "project_id": os.getenv("PROJECT_ID"),
+            "private_key_id": os.getenv("PRIVATE_KEY_ID"),
+            "private_key": os.getenv("PRIVATE_KEY"),
+            "client_email": os.getenv("CLIENT_EMAIL"),
+            "client_id": os.getenv("CLIENT_ID"),
+            "auth_uri": os.getenv("AUTH_URI"),
+            "token_uri": os.getenv("TOKEN_URI"),
+            "auth_provider_x509_cert_url": os.getenv("AUTH_PROVIDER_X509_CERT_URL"),
+            "client_x509_cert_url": os.getenv("CLIENT_X509_CERT_URL"),
+            "universe_domain": os.getenv("UNIVERSE_DOMAIN"),
+        }
+
+    
         self._initialize_firebase(service_account_path)
         self.db = firestore.client()
         self.current_user = None
 
-    def _initialize_firebase(self, service_account_path):
-        """Initialize the Firebase app with the provided service account credentials."""
+    def _initialize_firebase(self, service_account_path: Dict[str, str]) -> None:
+        """
+        Initialize the Firebase app with the provided service account credentials.
+
+        Args:
+            service_account_path (Dict[str, str]): Firebase service account credentials as a dictionary.
+        """
         cred = credentials.Certificate(service_account_path)
         firebase_admin.initialize_app(cred)
 
-    def create_account(self, username, password):
+    def create_account(self, username: str, password: str) -> bool:
         """
         Create a new user account.
 
         Args:
             username (str): Username for the new account.
             password (str): Password for the new account.
+
+        Returns:
+            bool: True if the account was created successfully, False otherwise.
         """
         user_data = self._get_user_data(username)
         if user_data:
             print("Username already exists. Please choose a different username.")
+            return False
         else:
             self._insert_document('users', username, {'password': password})
             print("Account created successfully!")
+            return True
 
-    def login(self, username, password):
+    def login(self, username: str, password: str) -> bool:
         """
         Authenticate a user based on username and password.
 
         Args:
             username (str): Username of the user.
             password (str): Password of the user.
+
+        Returns:
+            bool: True if login is successful, False otherwise.
         """
         user_data = self._get_user_data(username)
         if user_data and user_data.get('password') == password:
             self.current_user = username
             print("Login successful!")
+            return True
         else:
             print("Invalid username or password.")
+            return False
 
-    def logout(self):
-        """Log out the current user."""
+    def logout(self) -> bool:
+        """
+        Log out the current user.
+
+        Returns:
+            bool: True if logout is successful, False otherwise.
+        """
+
         if self.current_user:
             print(f"User '{self.current_user}' has logged out.")
             self.current_user = None
+            return True
         else:
             print("No user is currently logged in.")
+            return False
 
-    def add_transaction(self, serial_no, date, name, stock_symbol, transaction_type, count, price, total_amount):
+    def add_transaction(self, 
+                        serial_no: int, 
+                        date: str, 
+                        name: str, 
+                        stock_symbol: str, 
+                        transaction_type: str, 
+                        count: int, 
+                        price: float, 
+                        total_amount: float) -> bool:
         """
         Add a new stock transaction for the current user.
 
@@ -76,10 +126,13 @@ class StockTransactionManager:
             count (int): Number of shares.
             price (float): Price per share.
             total_amount (float): Total transaction amount.
+
+        Returns:
+            bool: True if the transaction was added successfully, False otherwise.
         """
         if not self.current_user:
             print("Please login to add a transaction.")
-            return
+            return False
 
         transaction_data = {
             'Sl_No': serial_no,
@@ -94,17 +147,22 @@ class StockTransactionManager:
         transactions_ref = self.db.collection('users').document(self.current_user).collection('transactions')
         transactions_ref.add(transaction_data)
         print("Transaction added successfully!")
+        
+        return True
 
-    def delete_transaction(self, serial_no):
+    def delete_transaction(self, serial_no: int) -> bool:
         """
         Delete a stock transaction by its serial number for the current user.
 
         Args:
             serial_no (int): The serial number of the transaction to delete.
+
+        Returns:
+            bool: True if the transaction was deleted successfully, False otherwise.
         """
         if not self.current_user:
             print("Please login to delete a transaction.")
-            return
+            return False
 
         transactions_ref = self.db.collection('users').document(self.current_user).collection('transactions')
         transactions = transactions_ref.where('Sl_No', '==', serial_no).stream()
@@ -117,9 +175,16 @@ class StockTransactionManager:
 
         if not deleted:
             print(f"No transaction found with serial number {serial_no}.")
+            
+        return deleted
 
-    def list_transactions(self):
-        """List all stock transactions for the current user."""
+    def list_transactions(self) -> None:
+        """
+        List all stock transactions for the current user.
+
+        Returns:
+            None
+        """
         if not self.current_user:
             print("Please login to view transactions.")
             return
@@ -138,13 +203,13 @@ class StockTransactionManager:
         doc_ref = self.db.collection('users').document(username)
         return doc_ref.get().to_dict() if doc_ref.get().exists else None
     
-    def transactions_to_dataframe(self):
+    def transactions_to_dataframe(self) -> Optional[pd.DataFrame]:
         """
-        Converts the user's transactions into a pandas DataFrame.
+        Convert the user's transactions into a pandas DataFrame.
 
         Returns:
-            pd.DataFrame: DataFrame containing all transactions if login is successful.
-                          None if login fails or no transactions are found.
+            Optional[pd.DataFrame]: DataFrame containing all transactions if successful,
+                                    None if no transactions are found or login fails.
         """
        
         # Fetch transactions for the user
@@ -185,20 +250,19 @@ class StockTransactionManager:
 
         return df
     
-    def add_transactions_from_excel(self, filepath="TransactionDeets.xlsx", username='Joel Joseph Justin', password='1234'):
+    def add_transactions_from_excel(self, filepath: str) ->None:
         """
         Add transactions from an Excel sheet to a user's Firestore transaction collection.
 
         Args:
-            manager (StockTransactionManager): Instance of the StockTransactionManager class.
             filepath (str): Path to the Excel file containing transaction data.
-            username (str): Username of the account to add transactions to.
-            password (str): Password of the account.
+
+        Returns:
+            None
         """
-        # Attempt login
-        self.login(username, password)
+        # Check if user is logged in
         if not self.current_user:
-            print("Failed to login. Transactions not added.")
+            print("FLogin to add transactions. Transactions not added.")
             return
         
         
@@ -219,33 +283,14 @@ class StockTransactionManager:
                 total_amount=row['Total Amount']
             )
         
-        self.logout()
-        
-        print(f"All transactions from {filepath} have been successfully added to {username}'s account.")
+        print(f"All transactions from {filepath} have been successfully added to {self.current_user}'s account.")
 
 
 
 def main():
     """Main function to interact with the StockTransactionManager."""
     
-    load_dotenv()
-    # Store all variables in a single dictionary
-    firebase_config = {
-        "type": os.getenv("TYPE"),
-        "project_id": os.getenv("PROJECT_ID"),
-        "private_key_id": os.getenv("PRIVATE_KEY_ID"),
-        "private_key": os.getenv("PRIVATE_KEY"),
-        "client_email": os.getenv("CLIENT_EMAIL"),
-        "client_id": os.getenv("CLIENT_ID"),
-        "auth_uri": os.getenv("AUTH_URI"),
-        "token_uri": os.getenv("TOKEN_URI"),
-        "auth_provider_x509_cert_url": os.getenv("AUTH_PROVIDER_X509_CERT_URL"),
-        "client_x509_cert_url": os.getenv("CLIENT_X509_CERT_URL"),
-        "universe_domain": os.getenv("UNIVERSE_DOMAIN"),
-    }
-
-    service_account_path = firebase_config
-    manager = StockTransactionManager(service_account_path)
+    manager = StockTransactionManager()
 
     #manager.add_transactions_from_excel()
     
