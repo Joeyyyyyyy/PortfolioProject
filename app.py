@@ -15,6 +15,7 @@ class StockPortfolioAPI:
         self.portfolio: StockPortfolio = None
         self.file_path=file_path
         
+        self.admindb=StockTransactionManager()
         self.app: Flask = Flask(__name__)
         self.app.secret_key = "secret_key"  # Required for session management
         self.api_key: str = "joel09-02-2024Adh"  # Hardcoded API key
@@ -66,16 +67,18 @@ class StockPortfolioAPI:
                 username = request.form.get("username").strip()
                 password = request.form.get("password")
                 
-                #print(username+" "+password)
+                login=self.admindb.login(username=username,password=password)
 
                 # Authentication logic (Replace with real authentication)
-                if username == "user" and password == "password":  # Example credentials
+                if login == True:  # Example credentials
+                    
+                    df=self.admindb.transactions_to_dataframe()
+                    
                     session["user"] = username
                     
-                    self.portfolio = StockPortfolio(file_path=self.file_path, dataframe=None)
+                    self.portfolio = StockPortfolio(dataframe=df)
                     if(self.file_path!=None):
                         self.portfolio.run()  # Pre-calculate values for fast access
-
                     
                     return redirect(url_for("stock_display"))
                 else:

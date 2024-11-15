@@ -281,7 +281,7 @@ class StockPortfolio:
         """
         if self.file_path!=None:
             self.net_holdings = self.load_excel()
-        elif self.df!=None:
+        elif self.df is not None and not self.df.empty:
             self.net_holdings = self.load_dataframe()
         else:
             return False
