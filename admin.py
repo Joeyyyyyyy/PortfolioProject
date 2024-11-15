@@ -291,8 +291,6 @@ def main():
     """Main function to interact with the StockTransactionManager."""
     
     manager = StockTransactionManager()
-
-    #manager.add_transactions_from_excel()
     
     while True:
         print("\nWelcome to the Stock Transaction Manager")
@@ -302,7 +300,8 @@ def main():
         print("4. Delete Transaction")
         print("5. List Transactions")
         print("6. Logout")
-        print("7. Exit")
+        print("7. Import Portfolio from Excel")
+        print("8. Exit")
 
         choice = input("Choose an option: ")
         
@@ -342,8 +341,12 @@ def main():
 
         elif choice == '6':
             manager.logout()
-
+            
         elif choice == '7':
+            manager.add_transactions_from_excel("DummyTransactions.xlsx")
+            break
+
+        elif choice == '8':
             print("Exiting program...")
             break
 

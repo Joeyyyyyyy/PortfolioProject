@@ -295,6 +295,6 @@ class StockPortfolio:
 
 # Example usage:
 if __name__ == "__main__":
-    file_path = 'TransactionDeets.xlsx'
+    file_path = 'DummyTransactions.xlsx'
     portfolio = StockPortfolio(file_path)
     portfolio.driver()
