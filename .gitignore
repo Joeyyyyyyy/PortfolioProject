@@ -5,4 +5,4 @@ __pycache__/
 .venv/
 
 # Ignore Google Cloud credentials file
-joelfirstfirebase-firebase-adminsdk-enebs-c1f1cd2c6b.json
+.env

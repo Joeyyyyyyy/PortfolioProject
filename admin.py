@@ -1,8 +1,10 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
 import datetime
-
-import pandas
+from dotenv import load_dotenv
+import os
+import pandas as pd
+from StockPortfolio import StockPortfolio
 
 class StockTransactionManager:
     """A manager class for handling user accounts and stock transactions in Firebase Firestore."""
@@ -122,12 +124,10 @@ class StockTransactionManager:
             print("Please login to view transactions.")
             return
 
-        transactions_ref = self.db.collection('users').document(self.current_user).collection('transactions')
-        transactions = transactions_ref.stream()
-
-        print(f"Transactions for user '{self.current_user}':")
-        for transaction in transactions:
-            print(transaction.to_dict())
+        df= self.transactions_to_dataframe()
+        portfolio=StockPortfolio(dataframe=df)
+        portfolio.driver()
+        
 
     def _insert_document(self, collection_name, document_id, data):
         """Insert a document into a specified collection."""
@@ -163,15 +163,92 @@ class StockTransactionManager:
             return None
 
         # Convert the list of dictionaries to a pandas DataFrame
-        df = pandas.DataFrame(transaction_list)
+        df = pd.DataFrame(transaction_list)
+        
+        # Reordering columns to match df
+        df = df[['Sl_No', 'Date', 'Share', 'Symbol', 'Transaction', 'Count', 'Price', 'Total_Amount']]
+
+        # Renaming columns to match df
+        df.rename(columns={'Sl_No': 'Sl.No.', 'Total_Amount': 'Total Amount'}, inplace=True)
+
+        # Removing the time component from the 'Date' column
+        df['Date'] = df['Date'].dt.date
+
+        # Ensuring 'Date' is in datetime format without time zone information (if necessary)
+        df['Date'] = pd.to_datetime(df['Date'])
+        
+        # Sorting df by 'Sl.No.' in ascending order
+        df = df.sort_values(by='Sl.No.').reset_index(drop=True)
+        
+        # Capitalizing the uncapitalized transaction entries
+        df['Transaction'] = df['Transaction'].str.capitalize()
+
         return df
+    
+    def add_transactions_from_excel(self, filepath="TransactionDeets.xlsx", username='Joel Joseph Justin', password='1234'):
+        """
+        Add transactions from an Excel sheet to a user's Firestore transaction collection.
+
+        Args:
+            manager (StockTransactionManager): Instance of the StockTransactionManager class.
+            filepath (str): Path to the Excel file containing transaction data.
+            username (str): Username of the account to add transactions to.
+            password (str): Password of the account.
+        """
+        # Attempt login
+        self.login(username, password)
+        if not self.current_user:
+            print("Failed to login. Transactions not added.")
+            return
+        
+        
+        # Load Excel data
+        data = pd.ExcelFile(filepath)
+        sheet_data = data.parse(data.sheet_names[0])
+        
+        # Loop through each row and add the transaction
+        for _, row in sheet_data.iterrows():
+            self.add_transaction(
+                serial_no=row['Sl.No.'],
+                date=row['Date'],
+                name=row['Share'],
+                stock_symbol=row['Symbol'],
+                transaction_type=row['Transaction'].lower(),
+                count=row['Count'],
+                price=row['Price'],
+                total_amount=row['Total Amount']
+            )
+        
+        self.logout()
+        
+        print(f"All transactions from {filepath} have been successfully added to {username}'s account.")
+
 
 
 def main():
     """Main function to interact with the StockTransactionManager."""
-    service_account_path = 'joelfirstfirebase-firebase-adminsdk-enebs-c1f1cd2c6b.json'
+    
+    load_dotenv()
+    # Store all variables in a single dictionary
+    firebase_config = {
+        "type": os.getenv("TYPE"),
+        "project_id": os.getenv("PROJECT_ID"),
+        "private_key_id": os.getenv("PRIVATE_KEY_ID"),
+        "private_key": os.getenv("PRIVATE_KEY"),
+        "client_email": os.getenv("CLIENT_EMAIL"),
+        "client_id": os.getenv("CLIENT_ID"),
+        "auth_uri": os.getenv("AUTH_URI"),
+        "token_uri": os.getenv("TOKEN_URI"),
+        "auth_provider_x509_cert_url": os.getenv("AUTH_PROVIDER_X509_CERT_URL"),
+        "client_x509_cert_url": os.getenv("CLIENT_X509_CERT_URL"),
+        "universe_domain": os.getenv("UNIVERSE_DOMAIN"),
+    }
+
+    service_account_path = firebase_config
     manager = StockTransactionManager(service_account_path)
 
+    #manager.add_transactions_from_excel()
+    
     while True:
         print("\nWelcome to the Stock Transaction Manager")
         print("1. Create Account")

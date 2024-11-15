@@ -40,17 +40,8 @@ class StockPortfolio:
     def load_dataframe(self):
         """Load the transaction data from the Database."""
         
-        if(self.df==None):
+        if self.df is None:
             return None
-        
-        # Dictionary for columns to rename
-        rename_columns = {
-            'Sl_No': 'Sl.No.',
-            'Total_Amount': 'Total Amount'
-        }
-
-        # Check if the DataFrame has the columns to rename and rename them if they exist
-        self.df.rename(columns={col: new_col for col, new_col in rename_columns.items() if col in self.df.columns}, inplace=True)
         
         self.df['Date'] = pd.to_datetime(self.df['Date'])
         self.df['Net Shares'] = self.df.apply(
@@ -270,7 +261,7 @@ class StockPortfolio:
         """
         if self.file_path!=None:
             self.net_holdings = self.load_excel()
-        elif self.df!=None:
+        elif self.df is not None and not self.df.empty:
             self.net_holdings = self.load_dataframe()
         else:
             return False
