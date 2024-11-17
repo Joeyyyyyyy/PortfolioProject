@@ -35,5 +35,7 @@
     <p><a href="/privacy-policy">Privacy Policy</a> | <a href="/terms-of-service">Terms of Service</a> | <a href="/contact">Contact Us</a></p>
   </footer>
 
+  <!-- Pass the login_failed flag as a data attribute -->
+  <div id="server-data" data-login-failed="{{ login_failed | tojson }}"></div>
 </body>
 </html>

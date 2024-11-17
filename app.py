@@ -63,6 +63,8 @@ class StockPortfolioAPI:
             """
             Handle login form submission and render login page.
             """
+            login_failed = request.args.get("login_failed", default=False, type=lambda v: v.lower() == "true")  # Initialize the flag
+            
             if request.method == "POST":
                 username = request.form.get("username").strip()
                 password = request.form.get("password")
@@ -84,8 +86,10 @@ class StockPortfolioAPI:
                 else:
                     session.pop("user", None)
                     flash("Invalid username or password")
-                    return redirect(url_for("login"))
-            return render_template("login.html")
+                    login_failed = True  # Set flag to indicate failure
+                    return redirect(url_for("login", login_failed=True))
+
+            return render_template("login.html", login_failed=login_failed)
 
         @self.app.route("/logout")
         def logout() -> str:

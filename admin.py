@@ -1,6 +1,6 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
-import datetime
+from datetime import datetime
 from dotenv import load_dotenv
 import os
 import pandas as pd
@@ -107,36 +107,46 @@ class StockTransactionManager:
 
     def add_transaction(self, 
                         serial_no: int, 
-                        date: str, 
+                        date: str|datetime, 
                         name: str, 
                         stock_symbol: str, 
                         transaction_type: str, 
                         count: int, 
                         price: float, 
-                        total_amount: float) -> bool:
+                        total_amount: float= 0.0) -> bool:
         """
         Add a new stock transaction for the current user.
 
         Args:
             serial_no (int): Serial number for the transaction.
-            date (str): Date of the transaction.
+            date (str|datetime): Date of the transaction.
             name (str): Name of the stock.
             stock_symbol (str): Stock symbol.
             transaction_type (str): Either "buy" or "sell".
             count (int): Number of shares.
             price (float): Price per share.
-            total_amount (float): Total transaction amount.
+            total_amount (float): (Not needed anymore) Total transaction amount.
 
         Returns:
             bool: True if the transaction was added successfully, False otherwise.
         """
+        total_amount=count*price
+        
         if not self.current_user:
             print("Please login to add a transaction.")
             return False
 
+        if(type(date)==str):
+            # Convert the string to a datetime object
+            date_object = datetime.strptime(date, "%d-%m-%Y")
+
+            # Format the datetime object to match the previous example's format
+            formatted_date = date_object.strftime("%d %B %Y at %H:%M:%S UTC%z")
+            fdate = datetime.strptime(formatted_date, "%d %B %Y at %H:%M:%S %Z")
+        
         transaction_data = {
             'Sl_No': serial_no,
-            'Date': date,
+            'Date': fdate,
             'Share': name,
             'Symbol': stock_symbol,
             'Transaction': transaction_type,
@@ -318,7 +328,7 @@ def main():
         elif choice == '3':
             if manager.current_user:
                 serial_no = int(input("Enter serial number: "))
-                date = input("Enter date (YYYY-MM-DD): ")
+                date = input("Enter date (DD-MM-YYYY): ")
                 name = input("Enter stock name: ")
                 stock_symbol = input("Enter stock symbol: ")
                 transaction_type = input("Enter transaction type (buy/sell): ").lower()
