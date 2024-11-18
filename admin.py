@@ -3,10 +3,8 @@ from firebase_admin import credentials, firestore
 from datetime import datetime
 from dotenv import load_dotenv
 import os
-from flask import Response, jsonify
 import pandas as pd
-from StockPortfolio import StockPortfolio
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict
 
 class StockTransactionManager:
     """A manager class for handling user accounts and stock transactions in Firebase Firestore."""
@@ -254,12 +252,12 @@ class StockTransactionManager:
         
         return updated
 
-    def list_transactions(self) -> Optional[Union[str, Response]]:
+    def list_transactions(self) -> Optional[pd.DataFrame]:
         """
         List all stock transactions for the current user.
 
         Returns:
-            Flask Response object with JSON data or None if no transactions found.
+            Dataframe with the user transactions data or None if no transactions found.
         """
         if not self.current_user:
             print("Please login to view transactions.")
@@ -273,10 +271,9 @@ class StockTransactionManager:
             if df.empty:
                 return None
             print(df)
-            return jsonify(df.to_dict(orient="records"))
+            return df
         except Exception as e:
             # Log the exception and return an error message
-            print(f"Error in listing transactions: {e}")
             return None
 
     def _insert_document(self, collection_name, document_id, data):

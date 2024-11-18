@@ -33,6 +33,18 @@ class StockPortfolioAPI:
             Returns:
                 str: HTML content for the home page.
             """
+            
+            if "user" in session:
+                if "password" not in session:
+                    session.pop('user',None)
+                    return render_template("index.html")
+                login=self.admindb.login(username=session["user"],password=session["password"])
+                if login == False:
+                    session.pop('user',None)
+                    return render_template("index.html")
+                df=self.admindb.transactions_to_dataframe()
+                self.portfolio = StockPortfolio(dataframe=df)
+            
             return render_template("index.html")
         
         @self.app.route("/")
@@ -42,7 +54,7 @@ class StockPortfolioAPI:
 
             Returns:
                 str: HTML content for the home page.
-            """
+            """             
             return render_template("index.html")
 
         @self.app.route("/stockDisplay")
@@ -77,6 +89,7 @@ class StockPortfolioAPI:
                     df=self.admindb.transactions_to_dataframe()
                     
                     session["user"] = username
+                    session["password"] = password
                     
                     self.portfolio = StockPortfolio(dataframe=df)
                     if(self.file_path!=None):
@@ -117,6 +130,21 @@ class StockPortfolioAPI:
             session.pop("user", None)
             flash("You have been logged out.")
             return redirect(url_for("home"))
+
+        @self.app.route("/api/transactionLogs", methods=["GET"])
+        def get_transaction_logs() -> tuple:
+            """
+            Get the list of transactions by the user.
+
+            Returns:
+                tuple: JSON response with transaction logs or error message.
+            """
+            if not self.is_authorized(request):
+                return jsonify({"error": "Unauthorized"}), 403
+            transactions = self.admindb.list_transactions()
+            if transactions is not None:
+                return jsonify(transactions.to_dict(orient="records"))
+            return jsonify({"error": "No transaction data available"}), 404
 
         @self.app.route("/api/held_stocks", methods=["GET"])
         def get_held_stocks() -> tuple:

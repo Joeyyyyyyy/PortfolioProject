@@ -1,87 +1,72 @@
-/* transaction.css */
-* {
+/* Base styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f9;
     color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
 }
 
+/* Center content */
 .container {
-    background-color: #ffffff;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    width: 100%;
+    max-width: 1200px;
+    margin: 50px auto;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
+/* Title */
 h1 {
     text-align: center;
-    font-size: 1.8rem;
-    color: #4CAF50;
-    margin-bottom: 1.5rem;
+    margin-bottom: 20px;
+    color: #444;
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
+/* Table styling */
+#transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
 }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+#transaction-table th,
+#transaction-table td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
 }
 
-label {
-    font-weight: bold;
-    color: #555;
+#transaction-table th {
+    background-color: #007bff;
+    color: #fff;
 }
 
-input, select {
-    padding: 0.8rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-    outline: none;
-    transition: border-color 0.3s ease;
+#transaction-table tr:hover {
+    background-color: #f1f1f1;
 }
 
-input:focus, select:focus {
-    border-color: #4CAF50;
+/* Loading message */
+#loading {
+    text-align: center;
+    font-size: 18px;
+    color: #007bff;
 }
 
-button {
-    padding: 0.8rem;
-    font-size: 1rem;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.hidden {
+    display: none;
 }
 
-button:hover {
-    background-color: #45a049;
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: 1rem;
+/* Responsive table */
+@media (max-width: 768px) {
+    #transaction-table th,
+    #transaction-table td {
+        padding: 10px;
+        font-size: 14px;
     }
 
     h1 {
-        font-size: 1.5rem;
+        font-size: 24px;
     }
 }

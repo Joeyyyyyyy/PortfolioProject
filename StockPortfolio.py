@@ -19,6 +19,7 @@ class StockPortfolio:
         self.held_stocks = None
         self.sold_stocks = None
         self.buys = None
+        self.realised_df=None
 
     def load_excel(self):
         """Load the transaction data from the Excel file."""
@@ -204,6 +205,21 @@ class StockPortfolio:
         # Convert realised_data list to a DataFrame
         realised_df = pd.DataFrame(realised_data)
         
+        if realised_df.empty== True:
+            columns = [
+            'Transaction ID',
+            'Sell Date',
+            'Stock Code',
+            'Shares Sold',
+            'Sell Price (per share)',
+            'Total Sell Value',
+            'Avg Buy Price',
+            'Total Buy Value',
+            'Profit/Loss'
+            ]
+
+            realised_df = pd.DataFrame(columns=columns)
+        
         # Rename columns for user-friendly presentation
         realised_df = realised_df.rename(columns={
             'Sell Sl.No.': 'Transaction ID',
@@ -230,9 +246,7 @@ class StockPortfolio:
                                 'Sell Price (per share)', 'Total Sell Value', 
                                 'Avg Buy Price', 'Total Buy Value', 'Profit/Loss']]
         
-        return realised_df
-
-
+        self.realised_df=realised_df
 
 
     def display_results(self): 
@@ -252,7 +266,7 @@ class StockPortfolio:
         return self.overall_profit_loss
 
     def getSoldStocksData(self):
-        return self.compute_realised_returns_dataframe()
+        return self.realised_df
 
     def driver(self):
         """
@@ -265,12 +279,14 @@ class StockPortfolio:
             self.net_holdings = self.load_dataframe()
         else:
             return False
-            
-        self.calculate_total_buying_price()
-        self.calculate_overall_profit_loss()
-        self.retrieve_current_prices()
-        self.calculate_potential_sale_values()
-        self.display_results()
+        
+        if self.df is not None:    
+            self.calculate_total_buying_price()
+            self.calculate_overall_profit_loss()
+            self.retrieve_current_prices()
+            self.calculate_potential_sale_values()
+            self.compute_realised_returns_dataframe()
+            self.display_results()
         
         return True
         
@@ -286,10 +302,12 @@ class StockPortfolio:
         else:
             return False
             
-        self.calculate_total_buying_price()
-        self.calculate_overall_profit_loss()
-        self.retrieve_current_prices()
-        self.calculate_potential_sale_values()
+        if self.df is not None:    
+            self.calculate_total_buying_price()
+            self.calculate_overall_profit_loss()
+            self.retrieve_current_prices()
+            self.calculate_potential_sale_values()
+            self.compute_realised_returns_dataframe()
         
         return True
 
