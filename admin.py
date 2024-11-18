@@ -3,6 +3,7 @@ from firebase_admin import credentials, firestore
 from datetime import datetime
 from dotenv import load_dotenv
 import os
+from flask import Response, jsonify
 import pandas as pd
 from StockPortfolio import StockPortfolio
 from typing import Optional, Dict, Any, Union
@@ -188,21 +189,95 @@ class StockTransactionManager:
             
         return deleted
 
-    def list_transactions(self) -> None:
+    def modify_transaction(self, serial_no: int, 
+                           date: Optional[str|datetime] = None, 
+                           name: Optional[str] = None, 
+                           stock_symbol: Optional[str] = None, 
+                           transaction_type: Optional[str] = None, 
+                           count: Optional[int] = None, 
+                           price: Optional[float] = None) -> bool:
+        
+        """
+        Modify an existing transaction identified by its serial number.
+
+        Args:
+            serial_no (int): Serial number of the transaction to modify.
+            date (Optional[str|datetime]): New date of the transaction (if provided).
+            name (Optional[str]): New name of the stock (if provided).
+            stock_symbol (Optional[str]): New stock symbol (if provided).
+            transaction_type (Optional[str]): New transaction type (if provided).
+            count (Optional[int]): New number of shares (if provided).
+            price (Optional[float]): New price per share (if provided).
+
+        Returns:
+            bool: True if the transaction was updated successfully, False otherwise.
+        """
+        if not self.current_user:
+            print("Please login to modify a transaction.")
+            return False
+
+        transactions_ref = self.db.collection('users').document(self.current_user).collection('transactions')
+        transactions = transactions_ref.where('Sl_No', '==', serial_no).stream()
+
+        updated = False
+        for transaction in transactions:
+            transaction_data = transaction.to_dict()
+
+            # Update provided fields
+            if date:
+                if isinstance(date, str):
+                    date_object = datetime.strptime(date, "%d-%m-%Y")
+                    date = datetime.strptime(date_object.strftime("%d %B %Y at %H:%M:%S UTC%z"), "%d %B %Y at %H:%M:%S %Z")
+                transaction_data['Date'] = date
+            if name:
+                transaction_data['Share'] = name
+            if stock_symbol:
+                transaction_data['Symbol'] = stock_symbol
+            if transaction_type:
+                transaction_data['Transaction'] = transaction_type.lower()
+            if count:
+                transaction_data['Count'] = count
+            if price:
+                transaction_data['Price'] = price
+
+            # Recalculate total amount if count or price changed
+            if count or price:
+                transaction_data['Total_Amount'] = transaction_data['Count'] * transaction_data['Price']
+
+            # Update the transaction in Firestore
+            transaction.reference.update(transaction_data)
+            print(f"Transaction with serial number {serial_no} has been updated.")
+            updated = True
+
+        if not updated:
+            print(f"No transaction found with serial number {serial_no}.")
+        
+        return updated
+
+    def list_transactions(self) -> Optional[Union[str, Response]]:
         """
         List all stock transactions for the current user.
 
         Returns:
-            None
+            Flask Response object with JSON data or None if no transactions found.
         """
         if not self.current_user:
             print("Please login to view transactions.")
-            return
+            return None
 
-        df= self.transactions_to_dataframe()
-        portfolio=StockPortfolio(dataframe=df)
-        portfolio.driver()
-        
+        try:
+            # Convert transactions to a DataFrame
+            df = self.transactions_to_dataframe()
+            
+            # Check if the DataFrame is empty
+            if df.empty:
+                return None
+            print(df)
+            return jsonify(df.to_dict(orient="records"))
+        except Exception as e:
+            # Log the exception and return an error message
+            print(f"Error in listing transactions: {e}")
+            return None
 
     def _insert_document(self, collection_name, document_id, data):
         """Insert a document into a specified collection."""
@@ -311,7 +386,8 @@ def main():
         print("5. List Transactions")
         print("6. Logout")
         print("7. Import Portfolio from Excel")
-        print("8. Exit")
+        print("8. Modify Transactions")
+        print("9. Exit")
 
         choice = input("Choose an option: ")
         
@@ -355,8 +431,35 @@ def main():
         elif choice == '7':
             manager.add_transactions_from_excel("DummyTransactions.xlsx")
             break
-
+        
         elif choice == '8':
+            if manager.current_user:
+                serial_no = int(input("Enter the serial number of the transaction to modify: "))
+                print("Leave fields blank if you don't want to update them.")
+
+                date = input("Enter new date (DD-MM-YYYY) or press Enter to skip: ").strip()
+                date = date if date else None
+                
+                name = input("Enter new stock name or press Enter to skip: ").strip()
+                name = name if name else None
+                
+                stock_symbol = input("Enter new stock symbol or press Enter to skip: ").strip()
+                stock_symbol = stock_symbol if stock_symbol else None
+                
+                transaction_type = input("Enter new transaction type (buy/sell) or press Enter to skip: ").strip()
+                transaction_type = transaction_type.lower() if transaction_type else None
+                
+                count = input("Enter new number of shares or press Enter to skip: ").strip()
+                count = int(count) if count else None
+                
+                price = input("Enter new price per share or press Enter to skip: ").strip()
+                price = float(price) if price else None
+
+                manager.modify_transaction(serial_no, date, name, stock_symbol, transaction_type, count, price)
+            else:
+                print("Please login to modify a transaction.")
+        
+        elif choice == '9':
             print("Exiting program...")
             break
 

@@ -90,6 +90,24 @@ class StockPortfolioAPI:
                     return redirect(url_for("login", login_failed=True))
 
             return render_template("login.html", login_failed=login_failed)
+        
+        @self.app.route("/transaction", methods=["GET", "POST"])
+        def transaction_form():
+            """
+            Handle displaying and submitting the stock transaction form.
+
+            Returns:
+                str: Rendered HTML page for GET requests, or redirects after POST.
+            """
+            if "user" not in session:
+                flash("Please log in to access this page.")
+                return redirect(url_for("login"))
+
+            if request.method == "POST":
+                pass
+                #Enter POST LOGIC
+            # For GET requests, render the transaction form
+            return render_template("transaction.html")
 
         @self.app.route("/logout")
         def logout() -> str:

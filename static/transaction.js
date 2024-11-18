@@ -1,6 +1,5 @@
-// transaction.js
-document.getElementById('transaction-form').addEventListener('submit', function(event) {
-    event.preventDefault();
+document.getElementById('transaction-form').addEventListener('submit', async function(event) {
+    event.preventDefault(); // Prevent default form submission
 
     // Collect form data
     const serialNo = document.getElementById('serial_no').value;
@@ -18,14 +17,36 @@ document.getElementById('transaction-form').addEventListener('submit', function(
         document.getElementById('total_amount').value = totalAmount;
     }
 
-    // Display transaction summary
-    alert(`Transaction Summary:
-    Serial No: ${serialNo}
-    Date: ${date}
-    Stock Name: ${stockName}
-    Stock Symbol: ${stockSymbol}
-    Transaction Type: ${transactionType}
-    Number of Shares: ${shareCount}
-    Price per Share: ₹${pricePerShare}
-    Total Amount: ₹${totalAmount}`);
+    // Prepare data for submission
+    const formData = {
+        serial_no: serialNo,
+        date: date,
+        name: stockName,
+        stock_symbol: stockSymbol,
+        transaction_type: transactionType,
+        count: shareCount,
+        price: pricePerShare,
+        total_amount: totalAmount
+    };
+
+    try {
+        // Send data to the server
+        const response = await fetch('/transaction', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            alert("Transaction submitted successfully!");
+            window.location.href = "/stockDisplay"; // Redirect after success
+        } else {
+            const errorData = await response.json();
+            alert(`Error: ${errorData.message || 'An error occurred while submitting the transaction.'}`);
+        }
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+    }
 });
