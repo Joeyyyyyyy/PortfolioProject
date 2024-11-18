@@ -19,6 +19,7 @@ class StockPortfolioAPI:
         self.app: Flask = Flask(__name__)
         self.app.secret_key = "secret_key"  # Required for session management
         self.api_key: str = "joel09-02-2024Adh"  # Hardcoded API key
+        self.df = None
         self.setup_routes()  # Initialize all routes
 
     def setup_routes(self) -> None:
@@ -37,13 +38,13 @@ class StockPortfolioAPI:
             if "user" in session:
                 if "password" not in session:
                     session.pop('user',None)
-                    return render_template("index.html")
                 login=self.admindb.login(username=session["user"],password=session["password"])
                 if login == False:
                     session.pop('user',None)
-                    return render_template("index.html")
-                df=self.admindb.transactions_to_dataframe()
-                self.portfolio = StockPortfolio(dataframe=df)
+                if self.df is None:
+                    self.df=self.admindb.transactions_to_dataframe()
+                if self.portfolio is None:
+                    self.portfolio = StockPortfolio(dataframe=self.df)
             
             return render_template("index.html")
         
@@ -65,9 +66,21 @@ class StockPortfolioAPI:
             Returns:
                 str: HTML content for the stock display page.
             """
-            if "user" not in session:
-                flash("Please log in to access this page.")
-                return redirect(url_for("login"))
+            if "user" in session:
+                if "password" not in session:
+                    flash("Please log in to access this page.")
+                    session.pop("user",None)
+                    return redirect(url_for("login"))
+                login=self.admindb.login(username=session["user"],password=session["password"])
+                if login == False:
+                    flash("Please log in to access this page.")
+                    session.pop("user",None)
+                    return redirect(url_for("login"))
+                if self.df is None:
+                    self.df=self.admindb.transactions_to_dataframe()
+                if self.portfolio is None:
+                    self.portfolio = StockPortfolio(dataframe=self.df)
+                
             return render_template("stockDisplay.html")
 
         @self.app.route("/login", methods=["GET", "POST"])
@@ -86,12 +99,12 @@ class StockPortfolioAPI:
                 # Authentication logic (Replace with real authentication)
                 if login == True:  # Example credentials
                     
-                    df=self.admindb.transactions_to_dataframe()
+                    self.df=self.admindb.transactions_to_dataframe()
                     
                     session["user"] = username
                     session["password"] = password
                     
-                    self.portfolio = StockPortfolio(dataframe=df)
+                    self.portfolio = StockPortfolio(dataframe=self.df)
                     if(self.file_path!=None):
                         self.portfolio.run()  # Pre-calculate values for fast access
                     
