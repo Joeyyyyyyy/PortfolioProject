@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaction Logs</title>
+    <title>Editable Transaction Table</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -48,44 +48,53 @@
             background-color: #f1f7ff;
             cursor: pointer;
         }
-        .loading {
-            text-align: center;
-            font-size: 1.2em;
-            color: #007bff;
+        .action-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
         }
-        @media screen and (max-width: 768px) {
-            table thead {
-                display: none;
-            }
-            table, table tbody, table tr, table td {
-                display: block;
-                width: 100%;
-            }
-            table tr {
-                margin-bottom: 15px;
-            }
-            table td {
-                text-align: right;
-                padding-left: 50%;
-                position: relative;
-            }
-            table td::before {
-                content: attr(data-label);
-                position: absolute;
-                left: 0;
-                width: 50%;
-                text-align: left;
-                font-weight: bold;
-                text-transform: uppercase;
-            }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .add-btn, #submit-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        #submit-btn {
+            background-color: green;
+            display: none;
+        }
+        input[type="date"] {
+            padding: 5px;
+            font-size: 14px;
+            width: 90%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        select {
+            padding: 5px;
+            font-size: 14px;
+            width: 90%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Transaction Logs</h1>
-        <div class="loading" id="loading">Loading transactions...</div>
-        <table id="transaction-table" style="display: none;">
+        <h1>Editable Transaction Table</h1>
+        <table id="editable-table">
             <thead>
                 <tr>
                     <th>Sl.No.</th>
@@ -96,14 +105,21 @@
                     <th>Count</th>
                     <th>Price</th>
                     <th>Total Amount</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Rows will be injected here by JavaScript -->
+                <!-- Rows will be dynamically injected -->
             </tbody>
         </table>
+        <div class="button-container">
+            <button class="add-btn" onclick="addRow()">Add Row</button>
+            <button id="submit-btn" onclick="submitChanges()">Submit Changes</button>
+        </div>
     </div>
     <script>
+        let isModified = false;
+
         const apiUrl = '/api/transactionLogs'; // API endpoint for transaction logs
 
         async function fetchTransactions() {
@@ -119,37 +135,136 @@
                 }
 
                 const data = await response.json();
-                displayTransactions(data);
+                populateTable(data);
             } catch (error) {
-                document.getElementById('loading').textContent = 'Failed to load transactions.';
+                alert('Failed to load transactions.');
                 console.error(error);
             }
         }
 
-        function displayTransactions(transactions) {
-            const table = document.getElementById('transaction-table');
-            const tbody = table.querySelector('tbody');
+        function populateTable(transactions) {
+            const tbody = document.getElementById('editable-table').querySelector('tbody');
 
             transactions.forEach(transaction => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td data-label="Sl.No.">${transaction["Sl.No."]}</td>
-                    <td data-label="Date">${transaction.Date}</td>
-                    <td data-label="Share">${transaction.Share}</td>
-                    <td data-label="Symbol">${transaction.Symbol}</td>
-                    <td data-label="Transaction">${transaction.Transaction}</td>
-                    <td data-label="Count">${transaction.Count}</td>
-                    <td data-label="Price">${transaction.Price}</td>
-                    <td data-label="Total Amount">${transaction["Total Amount"]}</td>
+                    <td>${transaction["Sl.No."]}</td>
+                    <td><input type="date" value="${formatDate(transaction.Date)}"></td>
+                    <td contenteditable="true">${transaction.Share}</td>
+                    <td contenteditable="true">${transaction.Symbol}</td>
+                    <td>
+                        <select>
+                            <option value="Buy" ${transaction.Transaction === "Buy" ? "selected" : ""}>Buy</option>
+                            <option value="Sell" ${transaction.Transaction === "Sell" ? "selected" : ""}>Sell</option>
+                        </select>
+                    </td>
+                    <td contenteditable="true">${transaction.Count}</td>
+                    <td contenteditable="true">${transaction.Price}</td>
+                    <td>${transaction["Total Amount"]}</td>
+                    <td>
+                        <button class="action-btn" onclick="deleteRow(this)">Delete</button>
+                    </td>
                 `;
                 tbody.appendChild(row);
             });
-
-            document.getElementById('loading').style.display = 'none';
-            table.style.display = 'table';
         }
 
-        // Fetch and display transactions on page load
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toISOString().split('T')[0]; // YYYY-MM-DD
+        }
+
+        function addRow() {
+            const tbody = document.getElementById('editable-table').querySelector('tbody');
+            const lastRow = tbody.lastElementChild;
+            const lastSlNo = lastRow ? parseInt(lastRow.querySelector('td:first-child').textContent) : 0;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${lastSlNo + 1}</td>
+                <td><input type="date"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td>
+                    <select>
+                        <option value="Buy">Buy</option>
+                        <option value="Sell">Sell</option>
+                    </select>
+                </td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td>0</td>
+                <td>
+                    <button class="action-btn" onclick="deleteRow(this)">Delete</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+            markModified();
+        }
+
+        function deleteRow(button) {
+            const row = button.parentElement.parentElement;
+            row.remove();
+            markModified();
+        }
+
+        function markModified() {
+            isModified = true;
+            document.getElementById('submit-btn').style.display = 'inline-block';
+        }
+
+        function calculateTotal(row) {
+            const countCell = row.querySelector('td:nth-child(6)');
+            const priceCell = row.querySelector('td:nth-child(7)');
+            const totalCell = row.querySelector('td:nth-child(8)');
+
+            const count = parseFloat(countCell.textContent) || 0;
+            const price = parseFloat(priceCell.textContent) || 0;
+
+            totalCell.textContent = (count * price).toFixed(2);
+        }
+
+        function handleCellChange(event) {
+            const cell = event.target;
+            const row = cell.parentElement;
+
+            // If count or price changes, update the total amount
+            if (cell.cellIndex === 5 || cell.cellIndex === 6) {
+                calculateTotal(row);
+            }
+
+            markModified();
+        }
+
+        document.getElementById('editable-table').addEventListener('input', handleCellChange);
+
+        function submitChanges() {
+            const rows = document.querySelectorAll('#editable-table tbody tr');
+            const transactions = [];
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const transaction = {
+                    "Sl.No.": cells[0].textContent.trim(),
+                    Date: cells[1].querySelector('input[type="date"]').value,
+                    Share: cells[2].textContent.trim(),
+                    Symbol: cells[3].textContent.trim(),
+                    Transaction: cells[4].querySelector('select').value,
+                    Count: parseFloat(cells[5].textContent.trim()) || 0,
+                    Price: parseFloat(cells[6].textContent.trim()) || 0,
+                    "Total Amount": parseFloat(cells[7].textContent.trim()) || 0,
+                };
+                transactions.push(transaction);
+            });
+
+            console.log("Modified Transactions:", transactions);
+            alert('Changes submitted successfully!');
+            // TODO: Send transactions to server for updating
+            isModified = false;
+            document.getElementById('submit-btn').style.display = 'none';
+        }
+
+        // Fetch transactions on page load
         fetchTransactions();
     </script>
 </body>
