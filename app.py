@@ -3,6 +3,7 @@ from StockPortfolio import StockPortfolio
 import os
 from typing import Optional
 from admin import StockTransactionManager
+from datetime import datetime,timezone
 
 class StockPortfolioAPI:
     def __init__(self, file_path: str = None) -> None:
@@ -220,6 +221,51 @@ class StockPortfolioAPI:
             self.portfolio.run()
             realized_profit = self.portfolio.getRealisedProfit()
             return jsonify({"realized_profit": realized_profit})
+        
+        @self.app.route("/api/submit_transactions", methods=["POST"])
+        def submit_transactions():
+            """
+            Endpoint to handle submitted transaction data.
+            """
+            if not api.is_authorized(request):
+                return jsonify({"error": "Unauthorized"}), 403
+
+            # Get JSON data from the POST request
+            data = request.get_json()
+            
+
+            if not data:
+                return jsonify({"error": "Invalid data"}), 400
+
+            try:
+                
+                def convert_to_first_format(data):
+                    converted_data = []
+                    for entry in data:
+                        # Convert date string to DatetimeWithNanoseconds format
+                        date_object = datetime.strptime(entry['Date'], '%d-%m-%Y').replace(tzinfo=timezone.utc)
+                        converted_entry = {
+                            'Sl_No': entry['Sl.No.'],  # Rename to camelCase
+                            'Date': date_object,  # Convert to datetime object
+                            'Share': entry['Share'],
+                            'Symbol': entry['Symbol'],
+                            'Transaction': entry['Transaction'].lower(),  # Convert to lowercase
+                            'Count': entry['Count'],
+                            'Price': float(entry['Price']),  # Ensure float type for price
+                            'Total_Amount': float(entry['Total Amount'])  # Rename to camelCase
+                        }
+                        converted_data.append(converted_entry)
+                    return converted_data
+                
+                self.admindb.replace_transaction_history(convert_to_first_format(data))
+                
+                if data:
+                    return jsonify({"message": "Transactions updated successfully"}), 200
+                else:
+                    return jsonify({"error": "Failed to update transactions"}), 500
+            except Exception as e:
+                return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
 
     def is_authorized(self, request) -> bool:
         """

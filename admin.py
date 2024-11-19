@@ -396,7 +396,57 @@ class StockTransactionManager:
             )
         
         print(f"All transactions from {filepath} have been successfully added to {self.current_user}'s account.")
+        
+    def replace_transaction_history(self, transactions: list[dict]) -> Optional[bool]:
+        """
+        Deletes the entire transaction history of the logged-in user
+        and replaces it with new transactions from a given list.
 
+        Args:
+            transactions (list[dict]): List of new transaction dictionaries.
+        """
+        # Check if the user is logged in
+        if not self.current_user:
+            print("Please login to perform this action.")
+            return None
+        
+        try:
+            df=self.transactions_to_dataframe()
+            
+            # Delete all existing transactions
+            print("Deleting existing transaction history...")
+            self.delete_all_transactions()
+            
+            # Add new transactions from the provided list
+            print("Adding new transaction history...")
+            for transaction in transactions:
+                self.add_transaction(
+                    serial_no=transaction['Sl_No'],
+                    date=transaction['Date'],
+                    name=transaction['Share'],
+                    stock_symbol=transaction['Symbol'],
+                    transaction_type=transaction['Transaction'].lower(),
+                    count=transaction['Count'],
+                    price=transaction['Price'],
+                    total_amount=transaction['Total_Amount']
+                )
+            
+            print("Transaction history replaced successfully!")
+        except:
+            for _, row in df.iterrows():
+                self.add_transaction(
+                    serial_no=row['Sl_No'],
+                    date=row['Date'],
+                    name=row['Share'],
+                    stock_symbol=row['Symbol'],
+                    transaction_type=row['Transaction'].lower(),
+                    count=row['Count'],
+                    price=row['Price'],
+                    total_amount=row['Total_Amount']
+                )
+            return False
+
+        return True
 
 
 def main():

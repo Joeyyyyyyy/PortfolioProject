@@ -238,7 +238,7 @@
 
         document.getElementById('editable-table').addEventListener('input', handleCellChange);
 
-        function submitChanges() {
+        async function submitChanges() {
             const rows = document.querySelectorAll('#editable-table tbody tr');
             const transactions = [];
 
@@ -265,7 +265,29 @@
 
             console.log("Modified Transactions:", transactions);
             alert('Changes submitted successfully!');
+
             // TODO: Send transactions to server for updating
+            try {
+                const response = await fetch('/api/submit_transactions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': 'joel09-02-2024Adh' // API keys
+                    },
+                    body: JSON.stringify(transactions) // Convert transactions to JSON
+                });
+
+                if (response.ok) {
+                    alert('Changes submitted successfully!');
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.error}`);
+                }
+            } catch (error) {
+                console.error('Failed to submit transactions:', error);
+                alert('Failed to submit changes. Please try again.');
+            }
+
             isModified = false;
             document.getElementById('submit-btn').style.display = 'none';
         }
