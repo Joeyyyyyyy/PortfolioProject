@@ -48,13 +48,15 @@ class StockTransactionManager:
         cred = credentials.Certificate(service_account_path)
         firebase_admin.initialize_app(cred)
 
-    def create_account(self, username: str, password: str) -> bool:
+    def create_account(self, username: str, password: str, email: str = None, lastindex: int = 1) -> bool:
         """
         Create a new user account.
 
         Args:
             username (str): Username for the new account.
             password (str): Password for the new account.
+            email (str): E-mail of the account user.
+            lastindex (int): (Optional) Index of the first entry. Set to 1 by default.
 
         Returns:
             bool: True if the account was created successfully, False otherwise.
@@ -64,7 +66,7 @@ class StockTransactionManager:
             print("Username already exists. Please choose a different username.")
             return False
         else:
-            self._insert_document('users', username, {'password': password})
+            self._insert_document('users', username, {'password': password, 'email': email, 'lastindex': lastindex})
             print("Account created successfully!")
             return True
 
@@ -135,6 +137,8 @@ class StockTransactionManager:
             print("Please login to add a transaction.")
             return False
 
+        fdate = date
+        
         if(type(date)==str):
             # Convert the string to a datetime object
             date_object = datetime.strptime(date, "%d-%m-%Y")
@@ -276,6 +280,32 @@ class StockTransactionManager:
             # Log the exception and return an error message
             return None
 
+    def delete_all_transactions(self) -> bool:
+        """
+        Delete all stock transactions for the current user.
+
+        Returns:
+            bool: True if transactions were deleted successfully, False otherwise.
+        """
+        if not self.current_user:
+            print("Please login to delete transactions.")
+            return False
+
+        transactions_ref = self.db.collection('users').document(self.current_user).collection('transactions')
+        transactions = transactions_ref.stream()
+
+        deleted = False
+        for transaction in transactions:
+            transaction.reference.delete()
+            deleted = True
+
+        if deleted:
+            print(f"All transactions for user '{self.current_user}' have been deleted.")
+        else:
+            print("No transactions found to delete.")
+
+        return deleted
+
     def _insert_document(self, collection_name, document_id, data):
         """Insert a document into a specified collection."""
         self.db.collection(collection_name).document(document_id).set(data)
@@ -344,7 +374,7 @@ class StockTransactionManager:
         """
         # Check if user is logged in
         if not self.current_user:
-            print("FLogin to add transactions. Transactions not added.")
+            print("Login to add transactions. Transactions not added.")
             return
         
         
@@ -427,7 +457,6 @@ def main():
             
         elif choice == '7':
             manager.add_transactions_from_excel("DummyTransactions.xlsx")
-            break
         
         elif choice == '8':
             if manager.current_user:
@@ -459,6 +488,9 @@ def main():
         elif choice == '9':
             print("Exiting program...")
             break
+        
+        elif choice == 'd101':
+            manager.delete_all_transactions()
 
         else:
             print("Invalid choice, please try again.")

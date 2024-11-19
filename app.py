@@ -80,6 +80,8 @@ class StockPortfolioAPI:
                     self.df=self.admindb.transactions_to_dataframe()
                 if self.portfolio is None:
                     self.portfolio = StockPortfolio(dataframe=self.df)
+            else:
+                return redirect(url_for("login"))
                 
             return render_template("stockDisplay.html")
 
@@ -111,6 +113,7 @@ class StockPortfolioAPI:
                     return redirect(url_for("stock_display"))
                 else:
                     session.pop("user", None)
+                    self.admindb.logout()
                     flash("Invalid username or password")
                     login_failed = True  # Set flag to indicate failure
                     return redirect(url_for("login", login_failed=True))
@@ -125,8 +128,21 @@ class StockPortfolioAPI:
             Returns:
                 str: Rendered HTML page for GET requests, or redirects after POST.
             """
-            if "user" not in session:
-                flash("Please log in to access this page.")
+            if "user" in session:
+                if "password" not in session:
+                    flash("Please log in to access this page.")
+                    session.pop("user",None)
+                    return redirect(url_for("login"))
+                login=self.admindb.login(username=session["user"],password=session["password"])
+                if login == False:
+                    flash("Please log in to access this page.")
+                    session.pop("user",None)
+                    return redirect(url_for("login"))
+                if self.df is None:
+                    self.df=self.admindb.transactions_to_dataframe()
+                if self.portfolio is None:
+                    self.portfolio = StockPortfolio(dataframe=self.df)
+            else:
                 return redirect(url_for("login"))
 
             if request.method == "POST":
