@@ -410,9 +410,9 @@ class StockTransactionManager:
             print("Please login to perform this action.")
             return None
         
-        try:
-            df=self.transactions_to_dataframe()
-            
+        df=self.transactions_to_dataframe()
+        
+        try:    
             # Delete all existing transactions
             print("Deleting existing transaction history...")
             self.delete_all_transactions()

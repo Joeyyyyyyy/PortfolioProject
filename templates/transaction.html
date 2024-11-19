@@ -241,38 +241,61 @@
         async function submitChanges() {
             const rows = document.querySelectorAll('#editable-table tbody tr');
             const transactions = [];
+            let hasErrors = false;
 
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
                 const dateInput = cells[1].querySelector('input[type="date"]');
                 const dateValue = dateInput.value;
-                
-                // Convert the date to dd-mm-yyyy format
-                const formattedDate = formatDateForSubmit(dateValue);
 
-                const transaction = {
-                    "Sl.No.": parseFloat(cells[0].textContent.trim(), 10),
-                    Date: formattedDate, // Use formatted date here
-                    Share: cells[2].textContent.trim(),
-                    Symbol: cells[3].textContent.trim(),
-                    Transaction: cells[4].querySelector('select').value,
-                    Count: parseFloat(cells[5].textContent.trim()) || 0,
-                    Price: parseFloat(cells[6].textContent.trim()) || 0,
-                    "Total Amount": parseFloat(cells[7].textContent.trim()) || 0,
-                };
-                transactions.push(transaction);
+                // Validate each field
+                const share = cells[2].textContent.trim();
+                const symbol = cells[3].textContent.trim();
+                const transactionType = cells[4].querySelector('select').value;
+                const count = parseFloat(cells[5].textContent.trim());
+                const price = parseFloat(cells[6].textContent.trim());
+
+                if (!dateValue || !share || !symbol || !transactionType || isNaN(count) || isNaN(price) || count <= 0 || price <= 0) {
+                    // Highlight the row with errors
+                    row.style.backgroundColor = '#ffcccc'; // Red background for error
+                    hasErrors = true;
+                } else {
+                    // Reset row color if no error
+                    row.style.backgroundColor = '';
+                }
+
+                // Only add valid rows to the transactions list
+                if (!hasErrors) {
+                    const formattedDate = formatDateForSubmit(dateValue);
+
+                    const transaction = {
+                        "Sl.No.": parseFloat(cells[0].textContent.trim(), 10),
+                        Date: formattedDate,
+                        Share: share,
+                        Symbol: symbol,
+                        Transaction: transactionType,
+                        Count: count,
+                        Price: price,
+                        "Total Amount": parseFloat(cells[7].textContent.trim()) || 0,
+                    };
+                    transactions.push(transaction);
+                }
             });
 
-            console.log("Modified Transactions:", transactions);
-            alert('Changes submitted successfully!');
+            if (hasErrors) {
+                alert('Please correct the highlighted rows before submitting.');
+                return; // Stop submission
+            }
 
-            // TODO: Send transactions to server for updating
+            // Proceed with submission if no errors
+            console.log("Valid Transactions:", transactions);
+
             try {
                 const response = await fetch('/api/submit_transactions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-api-key': 'joel09-02-2024Adh' // API keys
+                        'x-api-key': 'joel09-02-2024Adh' // Replace with actual API key
                     },
                     body: JSON.stringify(transactions) // Convert transactions to JSON
                 });

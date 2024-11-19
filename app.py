@@ -233,13 +233,12 @@ class StockPortfolioAPI:
             # Get JSON data from the POST request
             data = request.get_json()
             
-
             if not data:
                 return jsonify({"error": "Invalid data"}), 400
 
             try:
                 
-                def convert_to_first_format(data):
+                def formatter(data):
                     converted_data = []
                     for entry in data:
                         # Convert date string to DatetimeWithNanoseconds format
@@ -257,13 +256,16 @@ class StockPortfolioAPI:
                         converted_data.append(converted_entry)
                     return converted_data
                 
-                self.admindb.replace_transaction_history(convert_to_first_format(data))
+                update= self.admindb.replace_transaction_history(formatter(data))
                 
-                if data:
+                if update:
+                    self.df = self.admindb.transactions_to_dataframe()
+                    self.portfolio = StockPortfolio(dataframe=self.df)
                     return jsonify({"message": "Transactions updated successfully"}), 200
                 else:
                     return jsonify({"error": "Failed to update transactions"}), 500
             except Exception as e:
+                
                 return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 
