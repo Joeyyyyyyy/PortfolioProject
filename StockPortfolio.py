@@ -143,7 +143,7 @@ class StockPortfolio:
                     return current_price
                 except Exception:
                     return None
-
+            self.net_holdings = self.net_holdings.reset_index(drop=True)
             self.held_stocks = self.net_holdings[self.net_holdings['Net Shares'] > 0].copy()
             self.held_stocks['Current Price'] = self.held_stocks['Symbol'].apply(get_current_price)
 
