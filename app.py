@@ -28,13 +28,13 @@ class StockPortfolioAPI:
         Set up the routes for the Flask app.
         """
         @self.app.route("/")
-        def home() -> str:
+        def index() -> str:
             """
             Render the home page.
 
             Returns:
                 str: HTML content for the home page.
-            """
+            """     
             
             if "user" in session:
                 if "password" not in session:
@@ -45,18 +45,8 @@ class StockPortfolioAPI:
                 if self.df is None:
                     self.df=self.admindb.transactions_to_dataframe()
                 if self.portfolio is None:
-                    self.portfolio = StockPortfolio(dataframe=self.df)
-            
-            return render_template("index.html")
-        
-        @self.app.route("/")
-        def index() -> str:
-            """
-            Render the home page.
-
-            Returns:
-                str: HTML content for the home page.
-            """             
+                    self.portfolio = StockPortfolio(dataframe=self.df) 
+                           
             return render_template("index.html")
 
         @self.app.route("/stockDisplay")
