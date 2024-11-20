@@ -54,44 +54,77 @@ class StockPortfolio:
 
     def calculate_total_buying_price(self):
         """
-        Calculate the total buying price for shares currently held. Also stores useful dataframes along the way.
+        Calculate the total buying price for shares currently held, ensuring that sold shares
+        are properly accounted for and partial transactions are handled.
         
-        :return: Total buying price and a dictionary with stock symbols as keys and their total buying price as values.
+        :return: None. Updates the instance attributes for buying costs and total buying price.
         """
-        data = self.df
+        data = self.df.copy()
+
+        # Add a "Net Count" column to track the impact of each transaction
         data['Net Count'] = data.apply(lambda row: row['Count'] if row['Transaction'] == 'Buy' else -row['Count'], axis=1)
         
-        #Saving sold stocks data in another dataframe
-        self.sold_stocks=data[data['Net Count']<0].reset_index(drop=True)
+        # Save sold stocks for later use
+        self.sold_stocks = data[data['Net Count'] < 0].reset_index(drop=True)
         
+        # Calculate net holdings per stock
         net_holdings = data.groupby('Symbol')['Net Count'].sum()
-        current_holdings = net_holdings[net_holdings > 0]
+        current_holdings = net_holdings[net_holdings > 0]  # Filter for stocks currently held
+        
+        # Filter buy transactions only
+        self.buys = data[data['Transaction'] == 'Buy'].copy()
+        self.buys = self.buys.reset_index(drop=True)  # Reset index for safe iteration
+        
+        # Create a copy of the buys to track remaining shares after sales
+        remaining_buys = self.buys.copy()
 
-        self.buys = data[data['Transaction'] == 'Buy']
-        buys_for_current_holdings = self.buys[self.buys['Symbol'].isin(current_holdings.index)]
+        # Deduct sold shares from relevant buy transactions
+        for _, sell_row in self.sold_stocks.iterrows():
+            sell_count = sell_row['Count']
+            sell_symbol = sell_row['Symbol']
+            
+            # Filter buy transactions for the sold stock, ensuring FIFO order
+            relevant_buys = remaining_buys[(remaining_buys['Symbol'] == sell_symbol) & (remaining_buys['Count'] > 0)]
+            relevant_buys = relevant_buys.sort_values(by='Date')
 
+            for idx, buy_row in relevant_buys.iterrows():
+                if sell_count <= 0:
+                    break
+                # Deduct shares from the relevant buy transaction
+                available_to_deduct = min(buy_row['Count'], sell_count)
+                remaining_buys.at[idx, 'Count'] -= available_to_deduct
+                sell_count -= available_to_deduct
+
+        # Calculate the cost of currently held shares using remaining buys
         buying_costs = {}
         total_cost = 0
+
         for symbol in current_holdings.index:
-            symbol_buys = buys_for_current_holdings[buys_for_current_holdings['Symbol'] == symbol].copy()
+            # Filter remaining buys for this stock
+            symbol_buys = remaining_buys[(remaining_buys['Symbol'] == symbol) & (remaining_buys['Count'] > 0)].copy()
             symbol_buys.sort_values(by='Date', inplace=True)
 
             total_shares_needed = current_holdings[symbol]
             symbol_total_cost = 0
+
             for _, row in symbol_buys.iterrows():
                 if total_shares_needed <= 0:
                     break
+
                 shares_to_consider = min(row['Count'], total_shares_needed)
                 symbol_total_cost += shares_to_consider * row['Price']
                 total_shares_needed -= shares_to_consider
 
+            # Log a warning if insufficient buys are available
+            if total_shares_needed > 0:
+                print(f"Warning: Not enough buy transactions to account for {total_shares_needed} shares of {symbol}.")
+
             buying_costs[symbol] = symbol_total_cost
             total_cost += symbol_total_cost
 
+        # Store results in instance attributes
         self.buying_costs = buying_costs
         self.net_holdings_buying_price = total_cost
-        
-        self.buys=self.buys.reset_index(drop=True)
 
     def calculate_overall_profit_loss(self):
         """Calculate the realized profit/loss including currently held shares."""
