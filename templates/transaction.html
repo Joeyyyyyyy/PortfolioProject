@@ -65,7 +65,7 @@
             text-align: center;
             margin-top: 20px;
         }
-        .add-btn, #submit-btn {
+        .add-btn, #submit-btn, #reset-btn {
             background-color: #007bff;
             color: white;
             border: none;
@@ -76,6 +76,10 @@
         }
         #submit-btn {
             background-color: green;
+            display: none;
+        }
+        #reset-btn {
+            background-color: grey;
             display: none;
         }
         input[type="date"] {
@@ -127,7 +131,7 @@
                 font-size: 14px;
             }
 
-            .add-btn, #submit-btn {
+            .add-btn, #submit-btn, #reset-btn {
                 padding: 8px 12px;
                 font-size: 14px;
             }
@@ -144,7 +148,7 @@
                 font-size: 12px;
             }
 
-            .add-btn, #submit-btn {
+            .add-btn, #submit-btn, #reset-btn {
                 padding: 6px 10px;
                 font-size: 12px;
             }
@@ -184,7 +188,7 @@
                 font-size: 11px;
             }
 
-            .add-btn, #submit-btn {
+            .add-btn, #submit-btn, #reset-btn {
                 padding: 4px 8px;
                 font-size: 10px;
             }
@@ -236,8 +240,8 @@
             <div class="modal-content">
                 <h2>Confirm Changes</h2>
                 <div id="changes-summary"></div>
-                <button onclick="confirmSubmission()">Confirm</button>
-                <button onclick="closeModal()">Cancel</button>
+                <button id="confirm-sub" onclick="confirmSubmission()">Confirm</button>
+                <button id="cancel-sub" onclick="closeModal()">Cancel</button>
             </div>
         </div>
     </div>
@@ -427,11 +431,15 @@
             });
 
             if (hasErrors) {
-                alert('Please correct the highlighted rows before submitting.');
+                setTimeout(() => {
+                    alert('Please correct the highlighted rows before submitting.');
+                }, 0);
                 return; // Stop submission
             }
 
             // Show confirmation modal with changes summary
+            document.getElementById('confirm-sub').style.display = 'inline-block';
+            document.getElementById('cancel-sub').style.display = 'inline-block';
             document.getElementById('changes-summary').innerHTML = changesSummary.join('');
             document.getElementById('confirmation-modal').style.display = 'flex';
 
@@ -440,6 +448,13 @@
         }
 
         async function confirmSubmission() {
+            const modalTitle = document.querySelector("#confirmation-modal .modal-content h2");
+            modalTitle.textContent = "Updating database...";
+            const changesSummary = document.getElementById("changes-summary");
+            changesSummary.innerHTML = ""; 
+
+            document.getElementById('confirm-sub').style.display = 'none';
+            document.getElementById('cancel-sub').style.display = 'none';
             try {
                 const response = await fetch('/api/submit_transactions', {
                     method: 'POST',
@@ -457,10 +472,12 @@
                     document.getElementById('submit-btn').style.display = 'none';
                     document.getElementById('reset-btn').style.display = 'none';
                 } else {
+                    document.getElementById('confirmation-modal').style.display = 'none';
                     const error = await response.json();
                     alert(`Error: ${error.error}`);
                 }
             } catch (error) {
+                document.getElementById('confirmation-modal').style.display = 'none';
                 console.error('Failed to submit transactions:', error);
                 alert('Failed to submit changes. Please try again.');
             }
