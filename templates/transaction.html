@@ -94,6 +94,25 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+        #confirmation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
 
         /* General reset for smaller screens */
         @media (max-width: 1200px) {
@@ -211,6 +230,15 @@
         <div class="button-container">
             <button class="add-btn" onclick="addRow()">Add Row</button>
             <button id="submit-btn" onclick="submitChanges()">Submit Changes</button>
+            <button id="reset-btn" style="display: none;" onclick="resetChanges()">Reset</button>
+        </div>
+        <div id="confirmation-modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Confirm Changes</h2>
+                <div id="changes-summary"></div>
+                <button onclick="confirmSubmission()">Confirm</button>
+                <button onclick="closeModal()">Cancel</button>
+            </div>
         </div>
     </div>
     <script>
@@ -307,7 +335,9 @@
         function markModified() {
             isModified = true;
             document.getElementById('submit-btn').style.display = 'inline-block';
+            document.getElementById('reset-btn').style.display = 'inline-block';
         }
+
 
         function calculateTotal(row) {
             const countCell = row.querySelector('td:nth-child(6)');
@@ -334,10 +364,22 @@
 
         document.getElementById('editable-table').addEventListener('input', handleCellChange);
 
+        async function resetChanges() {
+            if (confirm('Are you sure you want to discard all changes?')) {
+                const tbody = document.getElementById('editable-table').querySelector('tbody');
+                tbody.innerHTML = ''; // Clear the current table
+                await fetchTransactions(); // Reload the original data
+                isModified = false;
+                document.getElementById('submit-btn').style.display = 'none';
+                document.getElementById('reset-btn').style.display = 'none';
+            }
+        }
+
         async function submitChanges() {
             const rows = document.querySelectorAll('#editable-table tbody tr');
             const transactions = [];
             let hasErrors = false;
+            const changesSummary = [];
 
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
@@ -375,6 +417,12 @@
                         "Total Amount": parseFloat(cells[7].textContent.trim()) || 0,
                     };
                     transactions.push(transaction);
+
+                    changesSummary.push(`
+                        <p><strong>Row ${cells[0].textContent.trim()}:</strong> 
+                        ${transaction.Share} (${transaction.Symbol}) - 
+                        ${transaction.Transaction} ${transaction.Count} at ${transaction.Price}</p>
+                    `);
                 }
             });
 
@@ -383,21 +431,31 @@
                 return; // Stop submission
             }
 
-            // Proceed with submission if no errors
-            console.log("Valid Transactions:", transactions);
+            // Show confirmation modal with changes summary
+            document.getElementById('changes-summary').innerHTML = changesSummary.join('');
+            document.getElementById('confirmation-modal').style.display = 'flex';
 
+            // Store transactions globally for later confirmation
+            window.pendingTransactions = transactions;
+        }
+
+        async function confirmSubmission() {
             try {
                 const response = await fetch('/api/submit_transactions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-api-key': 'joel09-02-2024Adh' // Replace with actual API key
+                        'x-api-key': 'joel09-02-2024Adh'
                     },
-                    body: JSON.stringify(transactions) // Convert transactions to JSON
+                    body: JSON.stringify(window.pendingTransactions)
                 });
 
                 if (response.ok) {
                     alert('Changes submitted successfully!');
+                    document.getElementById('confirmation-modal').style.display = 'none';
+                    isModified = false;
+                    document.getElementById('submit-btn').style.display = 'none';
+                    document.getElementById('reset-btn').style.display = 'none';
                 } else {
                     const error = await response.json();
                     alert(`Error: ${error.error}`);
@@ -406,9 +464,10 @@
                 console.error('Failed to submit transactions:', error);
                 alert('Failed to submit changes. Please try again.');
             }
+        }
 
-            isModified = false;
-            document.getElementById('submit-btn').style.display = 'none';
+        function closeModal() {
+            document.getElementById('confirmation-modal').style.display = 'none';
         }
 
         // Utility function to format date to dd-mm-yyyy
@@ -419,7 +478,6 @@
             const year = date.getFullYear();
             return `${day}-${month}-${year}`;
         }
-
 
         // Fetch transactions on page load
         fetchTransactions();
