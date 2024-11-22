@@ -3,6 +3,10 @@ __pycache__/
 
 # Ignore the entire venv folder
 .venv/
+venv
+
+#Ignore metadata file for MacOs
+.DS_Store
 
 # Ignore Google Cloud credentials file
 .env
