@@ -20,6 +20,7 @@ class StockPortfolio:
         self.sold_stocks = None
         self.buys = None
         self.realised_df=None
+        self.potential_profit=None
 
     def load_excel(self):
         """Load the transaction data from the Excel file."""
@@ -160,6 +161,8 @@ class StockPortfolio:
         self.held_stocks['Potential Sale Value'] = self.held_stocks['Potential Sale Value'].round(2)
         self.held_stocks['Potential Sale Profit/Loss'] = self.held_stocks['Potential Sale Profit/Loss'].round(2)
         self.held_stocks.dropna(axis=0,inplace=True)
+        
+        self.potential_profit=self.held_stocks['Potential Sale Profit/Loss'].sum()
 
     def compute_realised_returns_dataframe(self):
         """
@@ -300,6 +303,9 @@ class StockPortfolio:
 
     def getSoldStocksData(self):
         return self.realised_df
+    
+    def getUnrealisedProfit(self):
+        return self.potential_profit
 
     def driver(self):
         """
