@@ -62,7 +62,9 @@ function fetchHeldStocks() {
                 row.innerHTML = `
                     <td>${stock.Share}</td>
                     <td>${stock["Net Shares"]}</td>
+                    <td>${stock["Avg Buying Price"].toFixed(2)}</td>
                     <td>${stock["Current Price"].toFixed(2)}</td>
+                    <td>${stock["Percentage Change"].toFixed(2)}</td>
                     <td>${stock["Potential Sale Value"].toFixed(2)}</td>
                     <td>${stock["Potential Sale Profit/Loss"].toFixed(2)}</td>
                 `;

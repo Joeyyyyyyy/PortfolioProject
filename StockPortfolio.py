@@ -381,6 +381,7 @@ class StockPortfolio:
             self.retrieve_current_prices()
             self.calculate_potential_sale_values()
             self.compute_realised_returns_dataframe()
+            self.retrieve_current_prices(mode="price_change")
         
         return True
 
