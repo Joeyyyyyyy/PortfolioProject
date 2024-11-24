@@ -28,7 +28,8 @@ body {
     padding-bottom: 1.5rem;
     padding-left: 2.5rem;
     padding-right: 2.5rem;
-    border: 1px solid #e5e7eb;
+    color: aliceblue;
+    /* border: 1px solid #e5e7eb; */
 }
 
 #soldTable th,
@@ -37,12 +38,13 @@ body {
     padding-bottom: 1.5rem;
     padding-left: 2.5rem; 
     padding-right: 2.5rem;
-    border: 1px solid #e5e7eb;
+    color: aliceblue;
+    /* border: 1px solid #e5e7eb; */
 }
 
-#tableSections {
+/* #tableSections {
     background-color: #333;
-}
-.container{
+} */
+/* .container{
     background-color: #a2a2a2;
-}
+} */
