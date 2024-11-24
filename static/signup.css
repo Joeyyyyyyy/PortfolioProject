@@ -7,7 +7,7 @@
 
 body {
   font-family: 'Arial', sans-serif;
-  background: linear-gradient(135deg, #6c63ff, #484bf4);
+  background: linear-gradient(25deg, #3b755d, #202938);
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -29,7 +29,7 @@ body {
 .signup-header h1 {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
-  color: #6c63ff;
+  color: #66a845;
 }
 
 .signup-header p {
@@ -70,7 +70,7 @@ input[type="password"]::placeholder {
 
 input:focus {
   outline: none;
-  border: 2px solid #6c63ff;
+  border: 2px solid #66a845;
 }
 
 .btn {
@@ -79,14 +79,14 @@ input:focus {
   font-size: 1rem;
   border: none;
   border-radius: 5px;
-  background: #6c63ff;
+  background: #3b755d;
   color: #fff;
   cursor: pointer;
   transition: background 0.3s;
 }
 
 .btn:hover {
-  background: #484bf4;
+  background: #66a845;;
 }
 
 .form-footer {
@@ -95,7 +95,7 @@ input:focus {
 }
 
 .form-footer a {
-  color: #6c63ff;
+  color: #66a845;
   text-decoration: none;
 }
 
