@@ -61,7 +61,6 @@ function fetchHeldStocks() {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${stock.Share}</td>
-                    <td>${stock.Symbol}</td>
                     <td>${stock["Net Shares"]}</td>
                     <td>${stock["Current Price"].toFixed(2)}</td>
                     <td>${stock["Potential Sale Value"].toFixed(2)}</td>

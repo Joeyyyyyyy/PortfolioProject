@@ -21,6 +21,7 @@ class StockPortfolio:
         self.buys = None
         self.realised_df=None
         self.potential_profit=None
+        self.held_stocks_updated=0
 
     def load_excel(self):
         """Load the transaction data from the Excel file."""
@@ -133,23 +134,51 @@ class StockPortfolio:
         total_sell_revenue = self.df[self.df['Transaction'] == 'Sell']['Total Amount'].sum()
         self.overall_profit_loss = total_sell_revenue - total_buy_cost + self.net_holdings_buying_price
 
-    def retrieve_current_prices(self, mode:str = 'held_stocks'):
+    def retrieve_current_prices(self, mode: str = 'held_stocks'):
         """Retrieve the current prices for held stocks using yfinance."""
-        print("Retrieving current stock prices....")
-        if(mode == 'held_stocks'):
-            def get_current_price(ticker):
-                try:
-                    stock = yf.Ticker(ticker)
-                    current_price = stock.history(period='1d')['Close'].iloc[-1]
-                    return current_price
-                except Exception:
-                    return None
-            self.net_holdings = self.net_holdings.reset_index(drop=True) #resetting the index
+
+        def get_current_price(ticker):
+            try:
+                stock = yf.Ticker(ticker)
+                current_price = stock.history(period='1d')['Close'].iloc[-1]
+                return current_price
+            except Exception:
+                return None
+
+        def get_yesterday_close(ticker):
+            try:
+                stock = yf.Ticker(ticker)
+                # Use '5d' period to get enough data for filtering
+                history = stock.history(period='5d')
+                if len(history) > 1:
+                    yesterday_close = history['Close'].iloc[-2]  # Second last row is previous close
+                else:
+                    yesterday_close = None
+                return yesterday_close
+            except Exception:
+                return None
+
+        self.net_holdings = self.net_holdings.reset_index(drop=True)  # Resetting the index
+
+        if mode == 'held_stocks':
+            print("Retrieving current stock prices....")
+            self.held_stocks_updated+=1
             self.held_stocks = self.net_holdings[self.net_holdings['Net Shares'] > 0].copy()
             self.held_stocks['Current Price'] = self.held_stocks['Symbol'].apply(get_current_price)
 
+        elif mode == 'price_change':
+            print("Retrieving previous day stock prices....")
+            if self.held_stocks_updated == 0:
+                self.held_stocks = self.net_holdings[self.net_holdings['Net Shares'] > 0].copy()
+            self.held_stocks_updated+=1
+            self.held_stocks['Current Price'] = self.held_stocks['Symbol'].apply(get_current_price)
+            self.held_stocks['Previous Closing'] = self.held_stocks['Symbol'].apply(get_yesterday_close)
+            self.held_stocks['Price Change'] = self.held_stocks['Net Shares']*(self.held_stocks['Current Price'] - self.held_stocks['Previous Closing'])
+            self.held_stocks['Percentage Change'] = 100*self.held_stocks['Price Change']/(self.held_stocks['Net Shares']*self.held_stocks['Previous Closing'])
+            self.held_stocks['Percentage Change']=self.held_stocks['Percentage Change'].round(2)
+
     def calculate_potential_sale_values(self):
-        """Calculate potential sale values and profit/loss for held stocks."""
+        """Calculate potential sale values, profit/loss for held stocks and avg buying price."""
         self.held_stocks['Potential Sale Value'] = (
             self.held_stocks['Net Shares'] * self.held_stocks['Current Price']
         )
@@ -157,6 +186,10 @@ class StockPortfolio:
             lambda row: row['Potential Sale Value'] - self.buying_costs.get(row['Symbol'], 0),
             axis=1
         )
+        self.held_stocks['Avg Buying Price'] = self.held_stocks.apply(
+            lambda row: self.buying_costs.get(row['Symbol'], 0)/row['Net Shares'],
+            axis=1
+        ).round(2)
         self.held_stocks['Current Price'] = self.held_stocks['Current Price'].round(2)
         self.held_stocks['Potential Sale Value'] = self.held_stocks['Potential Sale Value'].round(2)
         self.held_stocks['Potential Sale Profit/Loss'] = self.held_stocks['Potential Sale Profit/Loss'].round(2)
@@ -194,7 +227,6 @@ class StockPortfolio:
             for idx, buy_row in prior_buys.iterrows():
                 buy_count = buy_row['Count']
                 buy_price = buy_row['Price']
-                buy_total_amount = buy_row['Total Amount']
                 
                 if buy_count == 0:
                     continue  # Skip fully depleted buys
@@ -291,7 +323,8 @@ class StockPortfolio:
         print("Held stocks with potential sale values and profit/loss:\n")
         print(
             self.held_stocks[
-                ['Share', 'Symbol', 'Net Shares', 'Current Price', 'Potential Sale Value', 'Potential Sale Profit/Loss']
+                ['Share', 'Symbol', 'Net Shares', 'Avg Buying Price', 'Current Price', 'Potential Sale Value', 'Potential Sale Profit/Loss', 
+                 'Previous Closing', 'Price Change','Percentage Change']
             ].to_string(index=False)
         )
         
@@ -325,6 +358,7 @@ class StockPortfolio:
             self.retrieve_current_prices()
             self.calculate_potential_sale_values()
             self.compute_realised_returns_dataframe()
+            self.retrieve_current_prices(mode="price_change")
             self.display_results()
         
         return True
