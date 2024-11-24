@@ -112,3 +112,24 @@ function fetchSoldStocks() {
         })
         .catch(error => console.error("Error fetching sold stocks:", error));
 }
+
+/**
+ * Filters the table based on the search input.
+ */
+function searchTable() {
+    const searchValue = document.getElementById("search-input").value.toLowerCase();
+
+    const rows = document.querySelectorAll("#portfolio-table tbody tr");
+
+    rows.forEach(row => {
+        const shareCell = row.cells[0].textContent.toLowerCase();
+        const symbolCell = row.cells[1].textContent.toLowerCase();
+
+        if (shareCell.includes(searchValue) || symbolCell.includes(searchValue)) {
+            row.style.display = ""; 
+        } else {
+            row.style.display = "none"; 
+        }
+    });
+}
+
