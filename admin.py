@@ -67,7 +67,7 @@ class StockTransactionManager:
             return False
         else:
             self._insert_document('users', username, {'password': password, 'email': email, 'lastindex': lastindex})
-            print("Account created successfully!")
+            print(username+"'s account has been created successfully!")
             return True
 
     def login(self, username: str, password: str) -> bool:
