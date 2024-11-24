@@ -111,6 +111,41 @@ class StockPortfolioAPI:
 
             return render_template("login.html", login_failed=login_failed)
         
+        @self.app.route("/signup", methods=["GET", "POST"])
+        def signup():
+            """
+            Render the signup page and handle account creation.
+            """
+            if request.method == "POST":
+                # Get form data
+                username = request.form.get("username").strip()
+                email = request.form.get("email").strip()
+                password = request.form.get("password")
+                confirm_password = request.form.get("confirm_password")
+
+                # Validate input
+                if not username or not email or not password or not confirm_password:
+                    flash("All fields are required.", "error")
+                    return render_template("signup.html")
+
+                if password != confirm_password:
+                    flash("Passwords do not match.", "error")
+                    return render_template("signup.html")
+
+                # Interact with StockTransactionManager to create an account
+                try:
+                    success = self.admindb.create_account(username=username, password=password, email=email)
+                    if success:
+                        flash("Account created successfully! Please log in.", "success")
+                        return redirect(url_for("login"))
+                    else:
+                        flash("Username already exists. Please try a different username.", "error")
+                except Exception as e:
+                    flash(f"An error occurred: {str(e)}", "error")
+
+            # Render the signup page for GET requests or failed POST submissions
+            return render_template("signup.html")
+        
         @self.app.route("/transaction", methods=["GET", "POST"])
         def transaction_form():
             """
