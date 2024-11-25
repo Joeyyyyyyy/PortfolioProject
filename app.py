@@ -6,7 +6,7 @@ from admin import StockTransactionManager
 from datetime import datetime,timezone
 
 class StockPortfolioAPI:
-    def __init__(self, file_path: str = None) -> None:
+    def __init__(self) -> None:
         """
         Initialize the StockPortfolioAPI instance.
 
@@ -14,7 +14,6 @@ class StockPortfolioAPI:
             file_path (str): The path to the file containing stock portfolio data.
         """
         self.portfolio: StockPortfolio = None
-        self.file_path=file_path
         
         self.admindb=StockTransactionManager()
         self.app: Flask = Flask(__name__)
@@ -100,8 +99,6 @@ class StockPortfolioAPI:
                     session["password"] = password
                     
                     self.portfolio = StockPortfolio(user=username,dataframe=self.df) 
-                    if(self.file_path!=None):
-                        self.portfolio.run()  # Pre-calculate values for fast access
                     
                     return redirect(url_for("stock_display"))
                 else:
@@ -347,6 +344,10 @@ class StockPortfolioAPI:
 
 # To run the API
 if __name__ == "__main__":
-    api = StockPortfolioAPI(file_path="TransactionDeets.xlsx")
+    api = StockPortfolioAPI()
     port: int = int(os.environ.get("PORT", 8000))
     api.run(debug=True, host="0.0.0.0", port=port)
+
+# Expose the Flask app instance for Waitress
+api = StockPortfolioAPI()
+app = api.app
