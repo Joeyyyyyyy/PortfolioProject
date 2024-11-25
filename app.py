@@ -269,7 +269,6 @@ class StockPortfolioAPI:
             if not self.is_authorized(request):
                 return jsonify({"error": "Unauthorized"}), 403
             one_day_returns = self.portfolio.getOneDayReturns()
-            print(one_day_returns)
             return jsonify({"todays_returns": one_day_returns})
         
         @self.app.route("/api/submit_transactions", methods=["POST"])
