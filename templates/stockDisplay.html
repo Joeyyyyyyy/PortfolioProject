@@ -98,41 +98,120 @@
       </div>
     </nav>
 
-    <!--REALISED PROFIT CARD-->
+    <!-- REALISED PROFIT CARD -->
     <section
       id="portfolio-section"
-      class="flex items-center justify-center from-[#1C1C1C] to-[#2A2A2A] p-6 bg-[#0A0A0A]"
+      class="flex items-center justify-center bg-[#0A0A0A] p-6"
     >
-      <div class="container max-w-lg mx-auto bg-white rounded-lg shadow-lg p-8">
-        <h1 class="text-3xl font-bold text-gray-800 text-center mb-4">
+      <div class="container mx-auto">
+        <h1 class="text-3xl font-bold text-white text-center mb-6">
           My Stock Portfolio Analysis
         </h1>
-        <div id="profit" class="text-center">
-          <h2 class="text-xl font-semibold text-gray-800">Realized Profit:</h2>
-          <p
-            id="realized-profit"
-            class="text-4xl font-bold text-green-700 mt-2"
+        <!-- Card Container -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Realized Profit Card -->
+          <div
+            class="bg-gradient-to-br from-[#1F1F1F] via-[#121212] to-[#0A0A0A] rounded-lg shadow-lg p-6 text-center border border-[#1C1C1C] hover:shadow-xl hover:border-[#15803D] transition-all duration-300"
           >
-            ₹0.00
-          </p>
-        </div>
-        <div id="profit" class="text-center">
-          <h2 class="text-xl font-semibold text-gray-800">Unrealized Returns:</h2>
-          <p
-            id="unrealized-profit"
-            class="text-4xl font-bold text-green-700 mt-2"
+            <div
+              class="flex justify-center items-center text-[#15803D] text-2xl mb-4"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-8"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
+                />
+              </svg>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-200">
+              Realized Profit:
+            </h2>
+            <p
+              id="realized-profit"
+              class="text-3xl font-bold text-[#15803D] mt-2"
+            >
+              ₹0.00
+            </p>
+          </div>
+
+          <!-- Unrealized Returns Card -->
+          <div
+            class="bg-gradient-to-br from-[#1F1F1F] via-[#121212] to-[#0A0A0A] rounded-lg shadow-lg p-6 text-center border border-[#1C1C1C] hover:shadow-xl hover:border-[#15803D] transition-all duration-300"
           >
-            ₹0.00
-          </p>
-        </div>
-        <div id="profit" class="text-center">
-          <h2 class="text-xl font-semibold text-gray-800">Today's Returns:</h2>
-          <p
-            id="todays-returns"
-            class="text-4xl font-bold text-green-700 mt-2"
+            <div
+              class="flex justify-center items-center text-[#15803D] text-2xl mb-4"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-8"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z"
+                />
+              </svg>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-200">
+              Unrealized Returns:
+            </h2>
+            <p
+              id="unrealized-profit"
+              class="text-3xl font-bold text-[#15803D] mt-2"
+            >
+              ₹0.00
+            </p>
+          </div>
+
+          <!-- Today's Returns Card -->
+          <div
+            class="bg-gradient-to-br from-[#1F1F1F] via-[#121212] to-[#0A0A0A] rounded-lg shadow-lg p-6 text-center border border-[#1C1C1C] hover:shadow-xl hover:border-[#15803D] transition-all duration-300"
           >
-            ₹0.00
-          </p>
+            <div
+              class="flex justify-center items-center text-[#15803D] text-2xl mb-4"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-8"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"
+                />
+              </svg>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-200">
+              Today's Returns:
+            </h2>
+            <p
+              id="todays-returns"
+              class="text-3xl font-bold text-[#15803D] mt-2"
+            >
+              ₹0.00
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -270,17 +349,22 @@
             type="button"
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
+            <!-- viewBox="0 -3 27 29" -->
             <svg
-              class="w-4 h-4 me-2"
-              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 -3 27 29"
+              fill="none"
+              viewBox="0 -2 35 29"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-8"
             >
               <path
-                d="M1 5h1.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 1 0 0-2H8.576a3.228 3.228 0 0 0-6.152 0H1a1 1 0 1 0 0 2Zm18 4h-1.424a3.228 3.228 0 0 0-6.152 0H1a1 1 0 1 0 0 2h10.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 0 0 0-2Zm0 6H8.576a3.228 3.228 0 0 0-6.152 0H1a1 1 0 0 0 0 2h1.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 0 0 0-2Z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 9h3.75m-4.5 2.625h4.5M12 18.75 9.75 16.5h.375a2.625 2.625 0 0 0 0-5.25H9.75m.75-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
               />
             </svg>
+
             My Transactions
           </button>
         </a>
