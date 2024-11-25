@@ -3,7 +3,7 @@ import pandas as pd
 import yfinance as yf
 
 class StockPortfolio:
-    def __init__(self, file_path: str = None , sheet_name: str = 'Sheet1', dataframe: pd.DataFrame = None):
+    def __init__(self, user: str, file_path: str = None , sheet_name: str = 'Sheet1', dataframe: pd.DataFrame = None):
         """
         Initialize the StockPortfolio class with the path to the Excel file.
         
@@ -23,6 +23,7 @@ class StockPortfolio:
         self.realised_df=None
         self.potential_profit=None
         self.held_stocks_updated=0
+        self.user=user
 
     def load_excel(self) -> pd.DataFrame:
         """Load the transaction data from the Excel file."""
@@ -412,6 +413,6 @@ class StockPortfolio:
 # Example usage:
 if __name__ == "__main__":
     file_path = 'DummyTransactions.xlsx'
-    portfolio = StockPortfolio(file_path)
+    portfolio = StockPortfolio(user="Dummy",file_path=file_path)
     portfolio.driver()
     print(portfolio.getHeldStocks().columns)

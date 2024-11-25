@@ -39,13 +39,15 @@ class StockPortfolioAPI:
             if "user" in session:
                 if "password" not in session:
                     session.pop('user',None)
+                    return render_template("index.html")
                 login=self.admindb.login(username=session["user"],password=session["password"])
                 if login == False:
                     session.pop('user',None)
+                    return render_template("index.html")
                 if self.df is None:
                     self.df=self.admindb.transactions_to_dataframe()
-                if self.portfolio is None:
-                    self.portfolio = StockPortfolio(dataframe=self.df) 
+                if self.portfolio is None or self.portfolio.user!=session["user"]:
+                    self.portfolio = StockPortfolio(user=session["user"],dataframe=self.df) 
                            
             return render_template("index.html")
 
@@ -69,8 +71,8 @@ class StockPortfolioAPI:
                     return redirect(url_for("login"))
                 if self.df is None:
                     self.df=self.admindb.transactions_to_dataframe()
-                if self.portfolio is None:
-                    self.portfolio = StockPortfolio(dataframe=self.df)
+                if self.portfolio is None or self.portfolio.user!=session["user"]:
+                    self.portfolio = StockPortfolio(user=session["user"],dataframe=self.df) 
             else:
                 return redirect(url_for("login"))
                 
@@ -97,7 +99,7 @@ class StockPortfolioAPI:
                     session["user"] = username
                     session["password"] = password
                     
-                    self.portfolio = StockPortfolio(dataframe=self.df)
+                    self.portfolio = StockPortfolio(user=username,dataframe=self.df) 
                     if(self.file_path!=None):
                         self.portfolio.run()  # Pre-calculate values for fast access
                     
@@ -166,8 +168,8 @@ class StockPortfolioAPI:
                     return redirect(url_for("login"))
                 if self.df is None:
                     self.df=self.admindb.transactions_to_dataframe()
-                if self.portfolio is None:
-                    self.portfolio = StockPortfolio(dataframe=self.df)
+                if self.portfolio is None or self.portfolio.user!=session["user"]:
+                    self.portfolio = StockPortfolio(user=session["user"],dataframe=self.df) 
             else:
                 return redirect(url_for("login"))
 
@@ -309,7 +311,7 @@ class StockPortfolioAPI:
                 
                 if update:
                     self.df = self.admindb.transactions_to_dataframe()
-                    self.portfolio = StockPortfolio(dataframe=self.df)
+                    self.portfolio = StockPortfolio(user=session["user"],dataframe=self.df) 
                     return jsonify({"message": "Transactions updated successfully"}), 200
                 else:
                     return jsonify({"error": "Failed to update transactions"}), 500
