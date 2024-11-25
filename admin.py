@@ -410,6 +410,21 @@ class StockTransactionManager:
             print("Please login to perform this action.")
             return None
         
+        # Dictionary to store the first occurrence of each stock code
+        stock_code_to_name = {}
+        
+        # Iterate through the list and update names based on the first occurrence
+        for record in transactions:
+            stock_code = record["Symbol"]
+            stock_name = record["Share"]
+            
+            # If the stock code is seen for the first time, record its name
+            if stock_code not in stock_code_to_name:
+                stock_code_to_name[stock_code] = stock_name
+            else:
+                # Standardize the name to match the first occurrence
+                record["Share"] = stock_code_to_name[stock_code]
+            
         df=self.transactions_to_dataframe()
         
         try:    
