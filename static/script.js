@@ -6,6 +6,7 @@
  */
 document.addEventListener("DOMContentLoaded", function () {
     fetchRealizedProfit();
+    fetchUnrealizedProfit();
     fetchHeldStocks();
     fetchSoldStocks();
 });
@@ -34,6 +35,28 @@ function fetchRealizedProfit() {
             document.getElementById("realized-profit").textContent = `${data.realized_profit.toFixed(2)}`;
         })
         .catch(error => console.error("Error fetching realized profit:", error));
+}
+
+/**
+ * Fetches the unrealized profit data from the API and updates the page with the profit value.
+ * 
+ * @function fetchUnealizedProfit
+ * @throws {Error} Throws an error if the API request fails.
+ */
+function fetchUnrealizedProfit() {
+    fetch("/api/unrealisedprofit", {
+        headers: {
+            "x-api-key": API_KEY
+        }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error("Failed to fetch unrealized profit");
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById("unrealized-profit").textContent = `${data.unrealized_profit.toFixed(2)}`;
+        })
+        .catch(error => console.error("Error fetching unrealized profit:", error));
 }
 
 /**

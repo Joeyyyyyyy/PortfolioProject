@@ -247,7 +247,7 @@ class StockPortfolioAPI:
             realized_profit = self.portfolio.getRealisedProfit()
             return jsonify({"realized_profit": realized_profit})
         
-        @self.app.route("/api/profit", methods=["GET"])
+        @self.app.route("/api/unrealisedprofit", methods=["GET"])
         def get_unrealisedprofit() -> tuple:
             """
             Get the unrealized profit from the portfolio.
