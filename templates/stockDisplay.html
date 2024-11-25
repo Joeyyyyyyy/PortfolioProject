@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stock Portfolio</title>
     <link rel="stylesheet" href="/static/style.css" />
-    <script src="/static/script.js"></script>
     <link
       href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css"
       rel="stylesheet"
@@ -118,9 +117,18 @@
           </p>
         </div>
         <div id="profit" class="text-center">
-          <h2 class="text-xl font-semibold text-gray-800">Unrealized Profit:</h2>
+          <h2 class="text-xl font-semibold text-gray-800">Unrealized Returns:</h2>
           <p
             id="unrealized-profit"
+            class="text-4xl font-bold text-green-700 mt-2"
+          >
+            ₹0.00
+          </p>
+        </div>
+        <div id="profit" class="text-center">
+          <h2 class="text-xl font-semibold text-gray-800">Today's Returns:</h2>
+          <p
+            id="todays-returns"
             class="text-4xl font-bold text-green-700 mt-2"
           >
             ₹0.00

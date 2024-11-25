@@ -341,6 +341,8 @@ class StockPortfolio:
         return df
     
     def getRealisedProfit(self):
+        if self.realised_df is None:
+            return 0
         return self.overall_profit_loss
 
     def getSoldStocksData(self) -> Optional[pd.DataFrame]:
@@ -352,7 +354,15 @@ class StockPortfolio:
         return df
     
     def getUnrealisedProfit(self):
+        if self.held_stocks is None:
+            return 0
         return self.potential_profit
+    
+    def getOneDayReturns(self):
+        if self.held_stocks is None:
+            return 0
+        one_day_returns=self.held_stocks["Price Change"].sum()
+        return one_day_returns
 
     def driver(self):
         """

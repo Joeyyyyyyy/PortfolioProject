@@ -200,6 +200,20 @@ class StockPortfolioAPI:
             if transactions is not None:
                 return jsonify(transactions.to_dict(orient="records"))
             return jsonify({"error": "No transaction data available"}), 404
+        
+        @self.app.route("/api/profit", methods=["GET"])
+        def get_profit() -> tuple:
+            """
+            Get the realized profit from the portfolio.
+
+            Returns:
+                tuple: JSON response with the realized profit or error message.
+            """
+            if not self.is_authorized(request):
+                return jsonify({"error": "Unauthorized"}), 403
+            self.portfolio.run()
+            realized_profit = self.portfolio.getRealisedProfit()
+            return jsonify({"realized_profit": realized_profit})
 
         @self.app.route("/api/held_stocks", methods=["GET"])
         def get_held_stocks() -> tuple:
@@ -211,7 +225,6 @@ class StockPortfolioAPI:
             """
             if not self.is_authorized(request):
                 return jsonify({"error": "Unauthorized"}), 403
-            self.portfolio.run()
             held_stocks = self.portfolio.getHeldStocks()
             if held_stocks is not None:
                 return jsonify(held_stocks.to_dict(orient="records"))
@@ -227,25 +240,10 @@ class StockPortfolioAPI:
             """
             if not self.is_authorized(request):
                 return jsonify({"error": "Unauthorized"}), 403
-            self.portfolio.run()
             sold_stocks = self.portfolio.getSoldStocksData()
             if sold_stocks is not None:
                 return jsonify(sold_stocks.to_dict(orient="records"))
             return jsonify({"error": "No sold stocks data available"}), 404
-
-        @self.app.route("/api/profit", methods=["GET"])
-        def get_profit() -> tuple:
-            """
-            Get the realized profit from the portfolio.
-
-            Returns:
-                tuple: JSON response with the realized profit or error message.
-            """
-            if not self.is_authorized(request):
-                return jsonify({"error": "Unauthorized"}), 403
-            self.portfolio.run()
-            realized_profit = self.portfolio.getRealisedProfit()
-            return jsonify({"realized_profit": realized_profit})
         
         @self.app.route("/api/unrealisedprofit", methods=["GET"])
         def get_unrealisedprofit() -> tuple:
@@ -257,9 +255,22 @@ class StockPortfolioAPI:
             """
             if not self.is_authorized(request):
                 return jsonify({"error": "Unauthorized"}), 403
-            self.portfolio.run()
             unrealized_profit = self.portfolio.getUnrealisedProfit()
             return jsonify({"unrealized_profit": unrealized_profit})
+        
+        @self.app.route("/api/onedreturns", methods=["GET"])
+        def get_oneday_returns() -> tuple:
+            """
+            Get the one day returns from the portfolio.
+
+            Returns:
+                tuple: JSON response with the one day returns or error message.
+            """
+            if not self.is_authorized(request):
+                return jsonify({"error": "Unauthorized"}), 403
+            one_day_returns = self.portfolio.getOneDayReturns()
+            print(one_day_returns)
+            return jsonify({"todays_returns": one_day_returns})
         
         @self.app.route("/api/submit_transactions", methods=["POST"])
         def submit_transactions():
