@@ -64,9 +64,10 @@ function fetchHeldStocks() {
                     <td>${stock["Net Shares"]}</td>
                     <td>${stock["Avg Buying Price"].toFixed(2)}</td>
                     <td>${stock["Current Price"].toFixed(2)}</td>
-                    <td>${stock["Percentage Change"].toFixed(2)}</td>
                     <td>${stock["Potential Sale Value"].toFixed(2)}</td>
-                    <td>${stock["Potential Sale Profit/Loss"].toFixed(2)}</td>
+                    <td>${stock["Price Change"]}</td>
+                    <td>${stock["Percentage Change"]}</td>
+                    <td>${stock["Potential Sale Profit/Loss"]}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -99,14 +100,14 @@ function fetchSoldStocks() {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${stock["Transaction ID"]}</td>
-                    <td>${new Date(stock["Sell Date"]).toLocaleDateString()}</td>
+                    <td>${new Date(stock["Sell Date"]).toLocaleDateString('en-GB')}</td>
                     <td>${stock["Stock Code"]}</td>
                     <td>${stock["Shares Sold"]}</td>
                     <td>${stock["Sell Price (per share)"].toFixed(2)}</td>
                     <td>${stock["Avg Buy Price"].toFixed(2)}</td>
                     <td>${stock["Total Buy Value"].toFixed(2)}</td>
                     <td>${stock["Total Sell Value"].toFixed(2)}</td>
-                    <td>${stock["Profit/Loss"].toFixed(2)}</td>
+                    <td>${stock["Profit/Loss"]}</td>
                 `;
                 tbody.appendChild(row);
             });

@@ -247,6 +247,20 @@ class StockPortfolioAPI:
             realized_profit = self.portfolio.getRealisedProfit()
             return jsonify({"realized_profit": realized_profit})
         
+        @self.app.route("/api/profit", methods=["GET"])
+        def get_unrealisedprofit() -> tuple:
+            """
+            Get the unrealized profit from the portfolio.
+
+            Returns:
+                tuple: JSON response with the unrealized profit or error message.
+            """
+            if not self.is_authorized(request):
+                return jsonify({"error": "Unauthorized"}), 403
+            self.portfolio.run()
+            unrealized_profit = self.portfolio.getUnrealisedProfit()
+            return jsonify({"unrealized_profit": unrealized_profit})
+        
         @self.app.route("/api/submit_transactions", methods=["POST"])
         def submit_transactions():
             """

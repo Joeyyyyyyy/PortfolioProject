@@ -1,3 +1,4 @@
+from typing import Optional
 import pandas as pd
 import yfinance as yf
 
@@ -23,7 +24,7 @@ class StockPortfolio:
         self.potential_profit=None
         self.held_stocks_updated=0
 
-    def load_excel(self):
+    def load_excel(self) -> pd.DataFrame:
         """Load the transaction data from the Excel file."""
         
         if(self.file_path==None):
@@ -40,7 +41,7 @@ class StockPortfolio:
         
         return net_holdings
     
-    def load_dataframe(self):
+    def load_dataframe(self) -> pd.DataFrame:
         """Load the transaction data from the Database."""
         
         if self.df is None:
@@ -314,7 +315,7 @@ class StockPortfolio:
                                 'Sell Price (per share)', 'Total Sell Value', 
                                 'Avg Buy Price', 'Total Buy Value', 'Profit/Loss']]
         
-        self.realised_df=realised_df
+        self.realised_df=realised_df.sort_values(by='Sell Date')
 
 
     def display_results(self): 
@@ -328,14 +329,27 @@ class StockPortfolio:
             ].to_string(index=False)
         )
         
-    def getHeldStocks(self):
-        return self.held_stocks
+    def getHeldStocks(self) -> Optional[pd.DataFrame]:
+        """ Returns data of current holdings and has these columns: 'Share', 'Symbol', 'Net Shares', 'Current Price',
+       'Potential Sale Value', 'Potential Sale Profit/Loss',
+       'Avg Buying Price', 'Previous Closing', 'Price Change',
+       'Percentage Change'"""
+        df=self.held_stocks.copy()
+        df['Percentage Change'] = df['Percentage Change'].round(2).apply(lambda x: f"+{x}" if x > 0 else str(x))
+        df['Potential Sale Profit/Loss'] = df['Potential Sale Profit/Loss'].round(2).apply(lambda x: f"+{x}" if x > 0 else str(x))
+        df['Price Change'] = df['Price Change'].round(2).apply(lambda x: f"+{x}" if x > 0 else str(x))
+        return df
     
     def getRealisedProfit(self):
         return self.overall_profit_loss
 
-    def getSoldStocksData(self):
-        return self.realised_df
+    def getSoldStocksData(self) -> Optional[pd.DataFrame]:
+        """ Returns data of previously sold stocks and has these columns:'Transaction ID', 'Sell Date', 'Stock Code', 
+                                'Shares Sold', 'Sell Price (per share)', 'Total Sell Value', 
+                                'Avg Buy Price', 'Total Buy Value', 'Profit/Loss'"""
+        df=self.realised_df.copy()
+        df['Profit/Loss'] = df['Profit/Loss'].round(2).apply(lambda x: f"+{x}" if x > 0 else str(x))
+        return df
     
     def getUnrealisedProfit(self):
         return self.potential_profit
@@ -390,3 +404,4 @@ if __name__ == "__main__":
     file_path = 'DummyTransactions.xlsx'
     portfolio = StockPortfolio(file_path)
     portfolio.driver()
+    print(portfolio.getHeldStocks().columns)
