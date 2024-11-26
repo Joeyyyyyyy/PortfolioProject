@@ -1,3 +1,4 @@
+from datetime import datetime,timezone
 from typing import Optional
 import pandas as pd
 import yfinance as yf
@@ -409,6 +410,25 @@ class StockPortfolio:
             self.retrieve_current_prices(mode="price_change")
         
         return True
+    
+class MarketStatus:
+    def __init__(self):
+        pass
+    def is_market_open(self):
+        try:
+            stock = yf.Ticker("^NSEI")
+            hist = stock.history(period="1d", interval="1m")
+            
+            if not hist.empty:
+                # Get the most recent data point
+                last_trade_time = hist.index[-1].to_pydatetime()
+                current_time = datetime.now(timezone.utc)
+                # If the last trade was recent (within a few minutes), the market is likely open
+                if (current_time - last_trade_time).seconds < 5*60:
+                    return True
+        except:
+            return False
+        return False
 
 # Example usage:
 if __name__ == "__main__":

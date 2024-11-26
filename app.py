@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, render_template, redirect, url_for, session, flash, g
-from StockPortfolio import StockPortfolio
+from StockPortfolio import StockPortfolio,MarketStatus
 import os
 from typing import Optional
 from admin import StockTransactionManager
@@ -190,6 +190,20 @@ class StockPortfolioAPI:
             if transactions is not None:
                 return jsonify(transactions.to_dict(orient="records"))
             return jsonify({"error": "No transaction data available"}), 404
+        
+        @self.app.route("/api/market_status",methods=["GET"])
+        def get_market_status() -> tuple:
+            """
+            Returns the market status
+            
+            Returns:
+                bool: True if market is open and False if market is closed.
+            """
+            if not self.is_authorized(request):
+                return jsonify({"error": "Unauthorized"}),403
+            g.status=MarketStatus()
+            g.marketopen=g.status.is_market_open()
+            return jsonify({"market_status":g.marketopen})
         
         @self.app.route("/api/portfolio_data", methods=["GET"])
         def get_portfolio_data() -> tuple:
