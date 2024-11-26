@@ -1,32 +1,57 @@
 /**
- * Initializes event listeners for DOMContentLoaded.
- * Calls the functions to fetch realized profit, held stocks, and sold stocks data.
+ * Initializes event listeners and starts the data-fetching process.
+ * - Fetches and updates data immediately on page load.
+ * - Periodically updates data every 3 seconds using `setInterval`.
+ * - Prevents overlapping fetch operations by ensuring only one fetch runs at a time.
+ * - Reloads the page in case of fatal errors during the data-fetch process.
  */
 document.addEventListener("DOMContentLoaded", async function () {
-    try {
-        await fetchRealizedProfit(); // Wait for this to complete
+    let isFetching = false; // Flag to check if a fetch operation is in progress
 
-        fetchUnrealizedProfit(); 
-        fetchOneDayReturns()
-        fetchHeldStocks(); 
-        fetchSoldStocks(); 
-    } catch (error) {
-        console.error("Error during initialization:", error);
+    async function fetchAndUpdateData() {
+        if (isFetching) return; // Exit if a fetch operation is already running
+        isFetching = true;
+
+        try {
+            await fetchRealizedProfit();
+            
+            // Wait for all asynchronous functions to complete
+            await Promise.all([
+                fetchUnrealizedProfit(),
+                fetchOneDayReturns(),
+                fetchHeldStocks(),
+                fetchSoldStocks()
+            ]);
+        } catch (error) {
+            console.error("Error during data fetch and update:", error);
+            location.reload(); // Reload the page on failure
+        } finally {
+            isFetching = false; // Reset the flag after the fetch operation is complete
+        }
     }
+
+    // Run the fetch functions once on DOMContentLoaded
+    await fetchAndUpdateData();
+
+    // Start the periodic update (refresh) loop
+    setInterval(fetchAndUpdateData, 3000);
 });
+
 
 // Define the API key to be included in headers
 /** @constant {string} API_KEY - API key for authorization in request headers */
 const API_KEY = "joel09-02-2024Adh";
 
 /**
- * Fetches the realized profit data from the API and updates the page with the profit value.
+ * Fetches the realized profit data from the API and updates the DOM.
+ * - The data is fetched from `/api/profit`.
+ * - The "realized-profit" element is updated with the formatted value.
  * 
  * @function fetchRealizedProfit
- * @throws {Error} Throws an error if the API request fails.
+ * @throws {Error} Throws an error if the API request fails or the response is invalid.
  */
+
 async function fetchRealizedProfit() {
-    try {
         const response = await fetch("/api/profit", {
             headers: {
                 "x-api-key": API_KEY
@@ -35,15 +60,13 @@ async function fetchRealizedProfit() {
         if (!response.ok) throw new Error("Failed to fetch realized profit");
         const data = await response.json();
         document.getElementById("realized-profit").textContent = `${data.realized_profit.toFixed(2)}`;
-    } catch (error) {
-        console.error("Error fetching realized profit:", error);
-    }
+
 }
 
 /**
  * Fetches the unrealized profit data from the API and updates the page with the profit value.
  * 
- * @function fetchUnealizedProfit
+ * @function fetchUnrealizedProfit
  * @throws {Error} Throws an error if the API request fails.
  */
 function fetchUnrealizedProfit() {
@@ -75,7 +98,7 @@ function fetchOneDayReturns() {
         }
     })
         .then(response => {
-            if (!response.ok) throw new Error("Failed to fetch unrealized profit");
+            if (!response.ok) throw new Error("Failed to fetch today's returns");
             return response.json();
         })
         .then(data => {
@@ -131,7 +154,7 @@ function fetchHeldStocks() {
  * @function fetchSoldStocks
  * @throws {Error} Throws an error if the API request fails.
  */
-function fetchSoldStocks() {
+async function fetchSoldStocks() {
     fetch("/api/sold_stocks", {
         headers: {
             "x-api-key": API_KEY

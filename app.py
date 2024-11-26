@@ -210,6 +210,12 @@ class StockPortfolioAPI:
             """
             if not self.is_authorized(request):
                 return jsonify({"error": "Unauthorized"}), 403
+            if self.admindb.current_user==None:
+                self.admindb.login(username=session["user"],password=session["password"])
+            if self.df is None:
+                self.df=self.admindb.transactions_to_dataframe()
+            if self.portfolio == None:
+                self.portfolio=StockPortfolio(user=session["user"],dataframe=self.df)
             self.portfolio.run()
             realized_profit = self.portfolio.getRealisedProfit()
             return jsonify({"realized_profit": realized_profit})
