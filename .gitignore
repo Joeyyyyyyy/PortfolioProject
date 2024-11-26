@@ -12,4 +12,5 @@ venv
 .env
 
 # Ignore Test file
-fin.py
+test1.py
+test2.py

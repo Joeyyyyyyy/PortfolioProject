@@ -1,3 +1,4 @@
+import uuid
 import firebase_admin
 from firebase_admin import credentials, firestore
 from datetime import datetime
@@ -33,20 +34,22 @@ class StockTransactionManager:
             "universe_domain": os.getenv("UNIVERSE_DOMAIN"),
         }
 
-    
-        self._initialize_firebase(service_account_path)
-        self.db = firestore.client()
+        app_name = f"app_{uuid.uuid4().hex}"  # Generate a unique name
+        self.app=self._initialize_firebase(service_account_path, app_name=app_name)
+        self.db = firestore.client(app=self.app)
         self.current_user = None
 
-    def _initialize_firebase(self, service_account_path: Dict[str, str]) -> None:
+    def _initialize_firebase(self, service_account_path: Dict[str, str],app_name:str) -> None:
         """
         Initialize the Firebase app with the provided service account credentials.
 
         Args:
             service_account_path (Dict[str, str]): Firebase service account credentials as a dictionary.
         """
+        print(app_name)
         cred = credentials.Certificate(service_account_path)
-        firebase_admin.initialize_app(cred)
+        app=firebase_admin.initialize_app(cred,name=app_name)
+        return app
 
     def create_account(self, username: str, password: str, email: str = None, lastindex: int = 1) -> bool:
         """
