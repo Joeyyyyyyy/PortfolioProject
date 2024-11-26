@@ -15,24 +15,30 @@ const API_KEY = "joel09-02-2024Adh";
 /**
  * Fetches the portfolio data from the API and updates the relevant sections of the page.
  */
-function fetchPortfolioData() {
-    fetch("/api/portfolio_data", {
-        headers: {
-            "x-api-key": API_KEY
-        }
-    })
-        .then(response => {
-            if (!response.ok) throw new Error("Failed to fetch portfolio data");
-            return response.json();
-        })
-        .then(data => {
-            updateRealizedProfit(data.realized_profit);
-            updateUnrealizedProfit(data.unrealized_profit);
-            updateOneDayReturns(data.todays_returns);
-            updateHeldStocks(data.held_stocks);
-            updateSoldStocks(data.sold_stocks);
-        })
-        .catch(error => console.error("Error fetching portfolio data:", error));
+async function fetchPortfolioData() {
+    try{
+        const response=await fetch("/api/portfolio_data", {
+            headers: {
+                "x-api-key": API_KEY
+            }
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch portfolio data");
+
+        const data = await response.json();
+
+        updateRealizedProfit(data.realized_profit);
+        updateUnrealizedProfit(data.unrealized_profit);
+        updateOneDayReturns(data.todays_returns);
+        updateHeldStocks(data.held_stocks);
+        updateSoldStocks(data.sold_stocks);
+
+        // Schedule the next fetch after completion
+        setTimeout(fetchPortfolioData, 3000);
+    } catch(error) {
+        console.error("Error fetching portfolio data:", error);
+        location.reload();
+    }
 }
 
 /**
