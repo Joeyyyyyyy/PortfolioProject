@@ -7,7 +7,63 @@
  */
 document.addEventListener("DOMContentLoaded", async function () {
     let isFetching = false; // Flag to check if a fetch operation is in progress
+    let refreshInterval = null; // Variable to store the interval ID
+    const marketStartTime = { hour: 9, minute: 0 }; // Market opens at 9:30 AM
+    const marketEndTime = { hour: 16, minute: 0 }; // Market closes at 4:00 PM
 
+    /**
+     * Checks if the current time is within market hours.
+     * @returns {boolean} - True if within market hours, false otherwise.
+     */
+    function isMarketOpen() {
+        const now = new Date();
+        const start = new Date();
+        start.setHours(marketStartTime.hour, marketStartTime.minute, 0, 0);
+
+        const end = new Date();
+        end.setHours(marketEndTime.hour, marketEndTime.minute, 0, 0);
+        if(now >= start && now <= end)
+            console.log("Market is open")
+        else
+            console.log("Market is closed")
+
+        return now >= start && now <= end;
+    }
+
+    /**
+     * Starts the periodic refresh loop if the market is open.
+     */
+    function startRefreshLoop() {
+        if (refreshInterval) return; // Prevent multiple intervals
+        refreshInterval = setInterval(fetchAndUpdateData, 3000);
+        console.log("Started refresh loop");
+    }
+
+    /**
+     * Stops the periodic refresh loop.
+     */
+    function stopRefreshLoop() {
+        if (refreshInterval) {
+            clearInterval(refreshInterval);
+            refreshInterval = null;
+            console.log("Stopped refresh loop");
+        }
+    }
+
+    /**
+     * Toggles the refresh mechanism based on market hours.
+     */
+    function toggleRefreshBasedOnMarketHours() {
+        if (isMarketOpen()) {
+            startRefreshLoop();
+        } else {
+            stopRefreshLoop();
+        }
+    }
+
+    /**
+     * Fetches data and updates the UI, ensuring no overlap of fetch operations.
+     */
     async function fetchAndUpdateData() {
         if (isFetching) return; // Exit if a fetch operation is already running
         isFetching = true;
@@ -30,11 +86,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // Run the fetch functions once on DOMContentLoaded
+    // Initial fetch and market hours check
     await fetchAndUpdateData();
+    toggleRefreshBasedOnMarketHours();
 
-    // Start the periodic update (refresh) loop
-    setInterval(fetchAndUpdateData, 3000);
+    // Recheck market status every 30s
+    setInterval(toggleRefreshBasedOnMarketHours, 0.5 * 60 * 1000);
 });
 
 
