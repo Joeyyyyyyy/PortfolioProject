@@ -1,23 +1,76 @@
 /**
  * Initializes event listeners for DOMContentLoaded.
- * Calls the functions to fetch realized profit, held stocks, and sold stocks data.
+ * Calls the functions to fetch realized profit, held stocks, and sold stocks data during market hours.
  */
 document.addEventListener("DOMContentLoaded", function () {
     try {
-        fetchPortfolioData();
+        fetchPortfolioData(); // Always fetch data once when the page loads
+        checkMarketStatus(); // Start checking market status periodically
     } catch (error) {
         console.error("Error during initialization:", error);
     }
 });
 
 const API_KEY = "joel09-02-2024Adh";
+let periodicFetchActive = false; // Flag to track if periodic fetching is active
+
+/**
+ * Checks if the market is open (9 AM to 4 PM).
+ * @returns {boolean} True if market is open, otherwise false.
+ */
+function isMarketOpen() {
+    const now = new Date();
+    const start = new Date();
+    const startHour = 9; // 9 AM
+    const endHour = 16; // 4 PM
+
+    return now.getHours() >= startHour && now.getHours() < endHour;
+}
+
+/**
+ * Periodically checks the market status every 5 minutes.
+ * If the market is open, starts the portfolio data refresh functionality.
+ */
+function checkMarketStatus() {
+    const marketOpen = isMarketOpen();
+
+    if (marketOpen && !periodicFetchActive) {
+        periodicFetchActive = true;
+        startPeriodicFetch();
+    } else if (!marketOpen && periodicFetchActive) {
+        periodicFetchActive = false;
+    } 
+
+    // Recheck market status every 1 minute
+    setTimeout(checkMarketStatus, 1 * 60 * 1000); // 1 minute
+}
+
+/**
+ * Starts periodic fetching of portfolio data.
+ */
+function startPeriodicFetch() {
+    const periodicFetch = async () => {
+        if (!isMarketOpen()) {
+            console.log("Market has closed during periodic fetch. Stopping further execution.");
+            periodicFetchActive = false;
+            return; // Stop fetching data if the market is closed
+        }
+
+        await fetchPortfolioData();
+        if (periodicFetchActive) {
+            setTimeout(periodicFetch, 3000); // Schedule next fetch
+        }
+    };
+
+    periodicFetch(); // Start the first periodic fetch
+}
 
 /**
  * Fetches the portfolio data from the API and updates the relevant sections of the page.
  */
 async function fetchPortfolioData() {
-    try{
-        const response=await fetch("/api/portfolio_data", {
+    try {
+        const response = await fetch("/api/portfolio_data", {
             headers: {
                 "x-api-key": API_KEY
             }
@@ -33,9 +86,8 @@ async function fetchPortfolioData() {
         updateHeldStocks(data.held_stocks);
         updateSoldStocks(data.sold_stocks);
 
-        // Schedule the next fetch after completion
-        setTimeout(fetchPortfolioData, 3000);
-    } catch(error) {
+        console.log("Portfolio data fetched successfully.");
+    } catch (error) {
         console.error("Error fetching portfolio data:", error);
         location.reload();
     }
