@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template, redirect, url_for, session, flash
+from flask import Flask, jsonify, request, render_template, redirect, url_for, session, flash, g
 from StockPortfolio import StockPortfolio
 import os
 from typing import Optional
@@ -13,13 +13,9 @@ class StockPortfolioAPI:
         Args:
             file_path (str): The path to the file containing stock portfolio data.
         """
-        self.portfolio: StockPortfolio = None
-        
-        self.admindb=StockTransactionManager()
         self.app: Flask = Flask(__name__)
         self.app.secret_key = "secret_key"  # Required for session management
         self.api_key: str = "joel09-02-2024Adh"  # Hardcoded API key
-        self.df = None
         self.setup_routes()  # Initialize all routes
 
     def setup_routes(self) -> None:
@@ -39,14 +35,11 @@ class StockPortfolioAPI:
                 if "password" not in session:
                     session.pop('user',None)
                     return render_template("index.html")
-                login=self.admindb.login(username=session["user"],password=session["password"])
+                g.admindb=StockTransactionManager()
+                login=g.admindb.login(username=session["user"],password=session["password"])
                 if login == False:
                     session.pop('user',None)
                     return render_template("index.html")
-                if self.df is None:
-                    self.df=self.admindb.transactions_to_dataframe()
-                if self.portfolio is None or self.portfolio.user!=session["user"]:
-                    self.portfolio = StockPortfolio(user=session["user"],dataframe=self.df) 
                            
             return render_template("index.html")
 
@@ -63,15 +56,12 @@ class StockPortfolioAPI:
                     flash("Please log in to access this page.")
                     session.pop("user",None)
                     return redirect(url_for("login"))
-                login=self.admindb.login(username=session["user"],password=session["password"])
+                g.admindb=StockTransactionManager()
+                login=g.admindb.login(username=session["user"],password=session["password"])
                 if login == False:
                     flash("Please log in to access this page.")
                     session.pop("user",None)
                     return redirect(url_for("login"))
-                if self.df is None:
-                    self.df=self.admindb.transactions_to_dataframe()
-                if self.portfolio is None or self.portfolio.user!=session["user"]:
-                    self.portfolio = StockPortfolio(user=session["user"],dataframe=self.df) 
             else:
                 return redirect(url_for("login"))
                 
@@ -88,22 +78,23 @@ class StockPortfolioAPI:
                 username = request.form.get("username").strip()
                 password = request.form.get("password")
                 
-                login=self.admindb.login(username=username,password=password)
+                g.admindb=StockTransactionManager()
+                login=g.admindb.login(username=username,password=password)
 
                 # Authentication logic (Replace with real authentication)
                 if login == True:  # Example credentials
                     
-                    self.df=self.admindb.transactions_to_dataframe()
+                    g.df=g.admindb.transactions_to_dataframe()
                     
                     session["user"] = username
                     session["password"] = password
                     
-                    self.portfolio = StockPortfolio(user=username,dataframe=self.df) 
+                    g.portfolio = StockPortfolio(user=username,dataframe=g.df) 
                     
                     return redirect(url_for("stock_display"))
                 else:
                     session.pop("user", None)
-                    self.admindb.logout()
+                    g.admindb.logout()
                     flash("Invalid username or password")
                     login_failed = True  # Set flag to indicate failure
                     return redirect(url_for("login", login_failed=True))
@@ -133,7 +124,8 @@ class StockPortfolioAPI:
 
                 # Interact with StockTransactionManager to create an account
                 try:
-                    success = self.admindb.create_account(username=username, password=password, email=email)
+                    g.admindb=StockTransactionManager()
+                    success = g.admindb.create_account(username=username, password=password, email=email)
                     if success:
                         flash("Account created successfully! Please log in.", "success")
                         return redirect(url_for("login"))
@@ -158,15 +150,12 @@ class StockPortfolioAPI:
                     flash("Please log in to access this page.")
                     session.pop("user",None)
                     return redirect(url_for("login"))
-                login=self.admindb.login(username=session["user"],password=session["password"])
+                g.admindb=StockTransactionManager()
+                login=g.admindb.login(username=session["user"],password=session["password"])
                 if login == False:
                     flash("Please log in to access this page.")
                     session.pop("user",None)
                     return redirect(url_for("login"))
-                if self.df is None:
-                    self.df=self.admindb.transactions_to_dataframe()
-                if self.portfolio is None or self.portfolio.user!=session["user"]:
-                    self.portfolio = StockPortfolio(user=session["user"],dataframe=self.df) 
             else:
                 return redirect(url_for("login"))
 
@@ -195,7 +184,9 @@ class StockPortfolioAPI:
             """
             if not self.is_authorized(request):
                 return jsonify({"error": "Unauthorized"}), 403
-            transactions = self.admindb.list_transactions()
+            g.admindb=StockTransactionManager()
+            g.admindb.login(username=session["user"],password=session["password"])
+            transactions = g.admindb.list_transactions()
             if transactions is not None:
                 return jsonify(transactions.to_dict(orient="records"))
             return jsonify({"error": "No transaction data available"}), 404
@@ -210,14 +201,12 @@ class StockPortfolioAPI:
             """
             if not self.is_authorized(request):
                 return jsonify({"error": "Unauthorized"}), 403
-            if self.admindb.current_user==None:
-                self.admindb.login(username=session["user"],password=session["password"])
-            if self.df is None:
-                self.df=self.admindb.transactions_to_dataframe()
-            if self.portfolio == None:
-                self.portfolio=StockPortfolio(user=session["user"],dataframe=self.df)
-            self.portfolio.run()
-            realized_profit = self.portfolio.getRealisedProfit()
+            g.admindb=StockTransactionManager()
+            g.admindb.login(username=session["user"],password=session["password"])
+            g.df=g.admindb.transactions_to_dataframe()
+            g.portfolio=StockPortfolio(user=session["user"],dataframe=g.df)
+            g.portfolio.run()
+            realized_profit = g.portfolio.getRealisedProfit()
             return jsonify({"realized_profit": realized_profit})
 
         @self.app.route("/api/held_stocks", methods=["GET"])
@@ -230,7 +219,12 @@ class StockPortfolioAPI:
             """
             if not self.is_authorized(request):
                 return jsonify({"error": "Unauthorized"}), 403
-            held_stocks = self.portfolio.getHeldStocks()
+            g.admindb=StockTransactionManager()
+            g.admindb.login(username=session["user"],password=session["password"])
+            g.df=g.admindb.transactions_to_dataframe()
+            g.portfolio=StockPortfolio(user=session["user"],dataframe=g.df)
+            g.portfolio.run()
+            held_stocks = g.portfolio.getHeldStocks()
             if held_stocks is not None:
                 return jsonify(held_stocks.to_dict(orient="records"))
             return jsonify({"error": "No held stocks data available"}), 404
@@ -245,7 +239,12 @@ class StockPortfolioAPI:
             """
             if not self.is_authorized(request):
                 return jsonify({"error": "Unauthorized"}), 403
-            sold_stocks = self.portfolio.getSoldStocksData()
+            g.admindb=StockTransactionManager()
+            g.admindb.login(username=session["user"],password=session["password"])
+            g.df=g.admindb.transactions_to_dataframe()
+            g.portfolio=StockPortfolio(user=session["user"],dataframe=g.df)
+            g.portfolio.run()
+            sold_stocks = g.portfolio.getSoldStocksData()
             if sold_stocks is not None:
                 return jsonify(sold_stocks.to_dict(orient="records"))
             return jsonify({"error": "No sold stocks data available"}), 404
@@ -260,7 +259,12 @@ class StockPortfolioAPI:
             """
             if not self.is_authorized(request):
                 return jsonify({"error": "Unauthorized"}), 403
-            unrealized_profit = self.portfolio.getUnrealisedProfit()
+            g.admindb=StockTransactionManager()
+            g.admindb.login(username=session["user"],password=session["password"])
+            g.df=g.admindb.transactions_to_dataframe()
+            g.portfolio=StockPortfolio(user=session["user"],dataframe=g.df)
+            g.portfolio.run()
+            unrealized_profit = g.portfolio.getUnrealisedProfit()
             return jsonify({"unrealized_profit": unrealized_profit})
         
         @self.app.route("/api/onedreturns", methods=["GET"])
@@ -273,7 +277,12 @@ class StockPortfolioAPI:
             """
             if not self.is_authorized(request):
                 return jsonify({"error": "Unauthorized"}), 403
-            one_day_returns = self.portfolio.getOneDayReturns()
+            g.admindb=StockTransactionManager()
+            g.admindb.login(username=session["user"],password=session["password"])
+            g.df=g.admindb.transactions_to_dataframe()
+            g.portfolio=StockPortfolio(user=session["user"],dataframe=g.df)
+            g.portfolio.run()
+            one_day_returns = g.portfolio.getOneDayReturns()
             return jsonify({"todays_returns": one_day_returns})
         
         @self.app.route("/api/submit_transactions", methods=["POST"])
@@ -309,12 +318,11 @@ class StockPortfolioAPI:
                         }
                         converted_data.append(converted_entry)
                     return converted_data
-                
-                update= self.admindb.replace_transaction_history(formatter(data))
+                g.admindb=StockTransactionManager()
+                g.admindb.login(username=session["user"],password=session["password"])
+                update= g.admindb.replace_transaction_history(formatter(data))
                 
                 if update:
-                    self.df = self.admindb.transactions_to_dataframe()
-                    self.portfolio = StockPortfolio(user=session["user"],dataframe=self.df) 
                     return jsonify({"message": "Transactions updated successfully"}), 200
                 else:
                     return jsonify({"error": "Failed to update transactions"}), 500
