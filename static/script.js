@@ -22,10 +22,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const end = new Date();
         end.setHours(marketEndTime.hour, marketEndTime.minute, 0, 0);
-        if(now >= start && now <= end)
+        /**if(now >= start && now <= end)
             console.log("Market is open")
         else
-            console.log("Market is closed")
+            console.log("Market is closed")*/
 
         return now >= start && now <= end;
     }
