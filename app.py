@@ -191,99 +191,39 @@ class StockPortfolioAPI:
                 return jsonify(transactions.to_dict(orient="records"))
             return jsonify({"error": "No transaction data available"}), 404
         
-        @self.app.route("/api/profit", methods=["GET"])
-        def get_profit() -> tuple:
+        @self.app.route("/api/portfolio_data", methods=["GET"])
+        def get_portfolio_data() -> tuple:
             """
-            Get the realized profit from the portfolio.
+            Get all portfolio data in a single response.
 
             Returns:
-                tuple: JSON response with the realized profit or error message.
+                tuple: JSON response with all portfolio data or an error message.
             """
             if not self.is_authorized(request):
                 return jsonify({"error": "Unauthorized"}), 403
-            g.admindb=StockTransactionManager()
-            g.admindb.login(username=session["user"],password=session["password"])
-            g.df=g.admindb.transactions_to_dataframe()
-            g.portfolio=StockPortfolio(user=session["user"],dataframe=g.df)
-            g.portfolio.run()
-            realized_profit = g.portfolio.getRealisedProfit()
-            return jsonify({"realized_profit": realized_profit})
 
-        @self.app.route("/api/held_stocks", methods=["GET"])
-        def get_held_stocks() -> tuple:
-            """
-            Get the list of held stocks in the portfolio.
+            try:
+                # Initialize and prepare portfolio
+                g.admindb = StockTransactionManager()
+                g.admindb.login(username=session["user"], password=session["password"])
+                g.df = g.admindb.transactions_to_dataframe()
+                g.portfolio = StockPortfolio(user=session["user"], dataframe=g.df)
+                g.portfolio.run()
 
-            Returns:
-                tuple: JSON response with held stocks data or error message.
-            """
-            if not self.is_authorized(request):
-                return jsonify({"error": "Unauthorized"}), 403
-            g.admindb=StockTransactionManager()
-            g.admindb.login(username=session["user"],password=session["password"])
-            g.df=g.admindb.transactions_to_dataframe()
-            g.portfolio=StockPortfolio(user=session["user"],dataframe=g.df)
-            g.portfolio.run()
-            held_stocks = g.portfolio.getHeldStocks()
-            if held_stocks is not None:
-                return jsonify(held_stocks.to_dict(orient="records"))
-            return jsonify({"error": "No held stocks data available"}), 404
+                # Collect all data
+                portfolio_data = {
+                    "realized_profit": g.portfolio.getRealisedProfit(),
+                    "unrealized_profit": g.portfolio.getUnrealisedProfit(),
+                    "todays_returns": g.portfolio.getOneDayReturns(),
+                    "held_stocks": g.portfolio.getHeldStocks().to_dict(orient="records") if g.portfolio.getHeldStocks() is not None else [],
+                    "sold_stocks": g.portfolio.getSoldStocksData().to_dict(orient="records") if g.portfolio.getSoldStocksData() is not None else []
+                }
 
-        @self.app.route("/api/sold_stocks", methods=["GET"])
-        def get_sold_stocks() -> tuple:
-            """
-            Get the list of sold stocks in the portfolio.
+                return jsonify(portfolio_data)
 
-            Returns:
-                tuple: JSON response with sold stocks data or error message.
-            """
-            if not self.is_authorized(request):
-                return jsonify({"error": "Unauthorized"}), 403
-            g.admindb=StockTransactionManager()
-            g.admindb.login(username=session["user"],password=session["password"])
-            g.df=g.admindb.transactions_to_dataframe()
-            g.portfolio=StockPortfolio(user=session["user"],dataframe=g.df)
-            g.portfolio.run()
-            sold_stocks = g.portfolio.getSoldStocksData()
-            if sold_stocks is not None:
-                return jsonify(sold_stocks.to_dict(orient="records"))
-            return jsonify({"error": "No sold stocks data available"}), 404
-        
-        @self.app.route("/api/unrealisedprofit", methods=["GET"])
-        def get_unrealisedprofit() -> tuple:
-            """
-            Get the unrealized profit from the portfolio.
-
-            Returns:
-                tuple: JSON response with the unrealized profit or error message.
-            """
-            if not self.is_authorized(request):
-                return jsonify({"error": "Unauthorized"}), 403
-            g.admindb=StockTransactionManager()
-            g.admindb.login(username=session["user"],password=session["password"])
-            g.df=g.admindb.transactions_to_dataframe()
-            g.portfolio=StockPortfolio(user=session["user"],dataframe=g.df)
-            g.portfolio.run()
-            unrealized_profit = g.portfolio.getUnrealisedProfit()
-            return jsonify({"unrealized_profit": unrealized_profit})
-        
-        @self.app.route("/api/onedreturns", methods=["GET"])
-        def get_oneday_returns() -> tuple:
-            """
-            Get the one day returns from the portfolio.
-
-            Returns:
-                tuple: JSON response with the one day returns or error message.
-            """
-            if not self.is_authorized(request):
-                return jsonify({"error": "Unauthorized"}), 403
-            g.admindb=StockTransactionManager()
-            g.admindb.login(username=session["user"],password=session["password"])
-            g.df=g.admindb.transactions_to_dataframe()
-            g.portfolio=StockPortfolio(user=session["user"],dataframe=g.df)
-            g.portfolio.run()
-            one_day_returns = g.portfolio.getOneDayReturns()
-            return jsonify({"todays_returns": one_day_returns})
+            except Exception as e:
+                # Handle errors gracefully
+                return jsonify({"error": str(e)}), 500
         
         @self.app.route("/api/submit_transactions", methods=["POST"])
         def submit_transactions():
