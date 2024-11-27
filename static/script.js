@@ -147,16 +147,24 @@ function updateHeldStocks(stocks) {
     tbody.innerHTML = ""; // Clear existing rows
     stocks.forEach(stock => {
         const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${stock.Share}</td>
-            <td>${stock["Net Shares"]}</td>
-            <td>${stock["Avg Buying Price"].toFixed(2)}</td>
-            <td>${stock["Current Price"].toFixed(2)}</td>
-            <td>${stock["Potential Sale Value"].toFixed(2)}</td>
-            <td>${stock["Price Change"]}</td>
-            <td>${stock["Percentage Change"]}</td>
-            <td>${stock["Potential Sale Profit/Loss"]}</td>
-        `;
+
+        const createStyledCell = (value) => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            cell.style.color = value.includes('+') ? "#66FF66" : "#FF6666"; // Set color based on value
+            return cell;
+        };
+
+        // Create each cell
+        row.appendChild(document.createElement("td")).textContent = stock.Share;
+        row.appendChild(document.createElement("td")).textContent = stock["Net Shares"];
+        row.appendChild(document.createElement("td")).textContent = stock["Avg Buying Price"].toFixed(2);
+        row.appendChild(document.createElement("td")).textContent = stock["Current Price"].toFixed(2);
+        row.appendChild(document.createElement("td")).textContent = stock["Potential Sale Value"].toFixed(2);
+        row.appendChild(createStyledCell(stock["Price Change"]));
+        row.appendChild(createStyledCell(stock["Percentage Change"]));
+        row.appendChild(createStyledCell(stock["Potential Sale Profit/Loss"]));
+
         tbody.appendChild(row);
     });
 }
@@ -179,7 +187,7 @@ function updateSoldStocks(stocks) {
             <td>${stock["Avg Buy Price"].toFixed(2)}</td>
             <td>${stock["Total Buy Value"].toFixed(2)}</td>
             <td>${stock["Total Sell Value"].toFixed(2)}</td>
-            <td>${stock["Profit/Loss"]}</td>
+            <td style="color: ${stock["Profit/Loss"].includes('+') ? '#66FF66' : '#FF6666'};">${stock["Profit/Loss"]}</td>
         `;
         tbody.appendChild(row);
     });
