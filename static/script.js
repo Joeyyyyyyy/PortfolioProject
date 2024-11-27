@@ -155,7 +155,6 @@ function updateHeldStocks(stocks) {
             return cell;
         };
 
-        // Create each cell
         row.appendChild(document.createElement("td")).textContent = stock.Share;
         row.appendChild(document.createElement("td")).textContent = stock["Net Shares"];
         row.appendChild(document.createElement("td")).textContent = stock["Avg Buying Price"].toFixed(2);
