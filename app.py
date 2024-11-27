@@ -75,12 +75,9 @@ class StockPortfolioAPI:
 
                 if login == True:  
                     print(username+" has logged in.")
-                    g.df=g.admindb.transactions_to_dataframe()
                     
                     session["user"] = username
                     session["password"] = password
-                    
-                    g.portfolio = StockPortfolio(user=username,dataframe=g.df) 
                     
                     return redirect(url_for("stock_display"))
                 else:
@@ -174,10 +171,10 @@ class StockPortfolioAPI:
                 return jsonify({"error": "Unauthorized"}), 403
             g.admindb=StockTransactionManager()
             g.admindb.login(username=session["user"],password=session["password"])
-            transactions = g.admindb.list_transactions()
+            transactions = g.admindb.transactions_to_dataframe()
             if transactions is not None:
                 return jsonify(transactions.to_dict(orient="records"))
-            return jsonify({"error": "No transaction data available"}), 404
+            return jsonify({"error": "No transaction data available"})
         
         @self.app.route("/api/market_status",methods=["GET"])
         def get_market_status() -> tuple:
@@ -209,6 +206,17 @@ class StockPortfolioAPI:
                 g.admindb = StockTransactionManager()
                 g.admindb.login(username=session["user"], password=session["password"])
                 g.df = g.admindb.transactions_to_dataframe()
+                
+                if g.df is None:
+                    portfolio_data={
+                        "realized_profit": 0,
+                        "unrealized_profit": 0,
+                        "todays_returns": 0,
+                        "held_stocks": [],
+                        "sold_stocks": []
+                    }
+                    return jsonify(portfolio_data)
+                
                 g.portfolio = StockPortfolio(user=session["user"], dataframe=g.df)
                 g.portfolio.run()
 

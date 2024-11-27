@@ -361,16 +361,20 @@
         try {
           const response = await fetch(apiUrl, {
             headers: {
-              "x-api-key": "joel09-02-2024Adh", // Replace with actual API key
+              "x-api-key": "joel09-02-2024Adh",
             },
           });
 
           if (!response.ok) {
-            throw new Error("Failed to fetch transactions");
+            // pass
           }
 
           const data = await response.json();
-          populateTable(data);
+          if ('error' in data) {
+            console.log("No data available:", data.error);
+          } else {
+            populateTable(data);
+          }
         } catch (error) {
           alert("Failed to load transactions.");
           console.error(error);

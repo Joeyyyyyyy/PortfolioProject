@@ -277,12 +277,11 @@ class StockTransactionManager:
             df = self.transactions_to_dataframe()
             
             # Check if the DataFrame is empty
-            if df.empty:
+            if df is None:
+                print("User has no data to display!")
                 return None
             print(df)
-            return df
         except Exception as e:
-            # Log the exception and return an error message
             return None
 
     def delete_all_transactions(self) -> bool:
