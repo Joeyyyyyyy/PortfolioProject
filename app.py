@@ -30,16 +30,8 @@ class StockPortfolioAPI:
             Returns:
                 str: HTML content for the home page.
             """     
-            
-            if "user" in session:
-                if "password" not in session:
-                    session.pop('user',None)
-                    return render_template("index.html")
-                g.admindb=StockTransactionManager()
-                login=g.admindb.login(username=session["user"],password=session["password"])
-                if login == False:
-                    session.pop('user',None)
-                    return render_template("index.html")
+            if "password" not in session:
+                session.pop('user',None)
                            
             return render_template("index.html")
 
@@ -81,9 +73,8 @@ class StockPortfolioAPI:
                 g.admindb=StockTransactionManager()
                 login=g.admindb.login(username=username,password=password)
 
-                # Authentication logic (Replace with real authentication)
-                if login == True:  # Example credentials
-                    
+                if login == True:  
+                    print(username+" has logged in.")
                     g.df=g.admindb.transactions_to_dataframe()
                     
                     session["user"] = username
@@ -96,7 +87,7 @@ class StockPortfolioAPI:
                     session.pop("user", None)
                     g.admindb.logout()
                     flash("Invalid username or password")
-                    login_failed = True  # Set flag to indicate failure
+                    login_failed = True  
                     return redirect(url_for("login", login_failed=True))
 
             return render_template("login.html", login_failed=login_failed)
@@ -134,7 +125,6 @@ class StockPortfolioAPI:
                 except Exception as e:
                     flash(f"An error occurred: {str(e)}", "error")
 
-            # Render the signup page for GET requests or failed POST submissions
             return render_template("signup.html")
         
         @self.app.route("/transaction", methods=["GET", "POST"])
@@ -161,8 +151,6 @@ class StockPortfolioAPI:
 
             if request.method == "POST":
                 pass
-                #Enter POST LOGIC
-            # For GET requests, render the transaction form
             return render_template("transaction.html")
 
         @self.app.route("/logout")

@@ -46,7 +46,6 @@ class StockTransactionManager:
         Args:
             service_account_path (Dict[str, str]): Firebase service account credentials as a dictionary.
         """
-        print(app_name)
         cred = credentials.Certificate(service_account_path)
         app=firebase_admin.initialize_app(cred,name=app_name)
         return app
@@ -66,20 +65,21 @@ class StockTransactionManager:
         """
         user_data = self._get_user_data(username)
         if user_data:
-            print("Username already exists. Please choose a different username.")
+            print("Username already exists.")
             return False
         else:
             self._insert_document('users', username, {'password': password, 'email': email, 'lastindex': lastindex})
             print(username+"'s account has been created successfully!")
             return True
 
-    def login(self, username: str, password: str) -> bool:
+    def login(self, username: str, password: str, silent:bool=True) -> bool:
         """
         Authenticate a user based on username and password.
 
         Args:
             username (str): Username of the user.
             password (str): Password of the user.
+            silent (bool): (Optional) Tells the login to execute with or without console message
 
         Returns:
             bool: True if login is successful, False otherwise.
@@ -87,10 +87,12 @@ class StockTransactionManager:
         user_data = self._get_user_data(username)
         if user_data and user_data.get('password') == password:
             self.current_user = username
-            print("Login successful!")
+            if silent is False:
+                print("Login successful!")
             return True
         else:
-            print("Invalid username or password.")
+            if silent is False:
+                print("Invalid username or password.")
             return False
 
     def logout(self) -> bool:
@@ -494,7 +496,7 @@ def main():
         elif choice == '2':
             username = input("Enter your username: ")
             password = input("Enter your password: ")
-            manager.login(username, password)
+            manager.login(username, password,silent=False)
 
         elif choice == '3':
             if manager.current_user:

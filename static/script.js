@@ -23,6 +23,26 @@ function isMarketOpen() {
     const start = new Date();
     const startHour = 9; // 9 AM
     const endHour = 16; // 4 PM
+    /*async function fetchMarketStatus() {
+        try {
+            const response = await fetch("/api/market_status", {
+                headers: {
+                    "x-api-key": API_KEY
+                }
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch market status");
+
+            const data = await response.json();
+            return data.market_status; // Assuming this is true/false
+        } catch (error) {
+            console.error("Error fetching market status: ", error);
+            return false; // Default to closed on error
+        }
+    }
+
+    const marketStatus = fetchMarketStatus();
+    console.log(marketStatus)*/
 
     return now.getHours() >= startHour && now.getHours() < endHour;
 }
@@ -91,6 +111,7 @@ async function fetchPortfolioData() {
         console.error("Error fetching portfolio data:", error);
         location.reload();
     }
+    searchTable();
 }
 
 /**
