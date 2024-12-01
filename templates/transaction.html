@@ -96,7 +96,32 @@
     </nav>
 
     <div class="container">
-      <h1 style="font-weight: 800">My Transactions</h1>
+      <!-- Flex Container for Button and Heading -->
+      <div class="flex items-center my-3 space-x-4">
+        <a href="/stockDisplay">
+          <button
+            type="button"
+            class="text-black-700 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-3 py-2 text-center inline-flex items-center dark:hover:bg-gray-200 dark:focus:ring-gray-200"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 -3 27 29"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+              />
+            </svg>
+          </button>
+        </a>
+        <h1 class="text-xl font-extrabold">My Transactions</h1>
+      </div>
+
       <table id="editable-table">
         <thead>
           <tr>
@@ -117,6 +142,7 @@
       </table>
       <div class="button-container">
         <button class="add-btn" onclick="addRow()">Add Row</button>
+
         <button id="submit-btn" onclick="submitChanges()">
           Submit Changes
         </button>
@@ -207,53 +233,98 @@
             Submitting Changes...
           </h3>
           <div class="flex justify-center items-center">
-            <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-            viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve" width="50" height="50">
-          <rect fill="#fff" width="1.5" height="50" transform="translate(0) rotate(180 1.5 25)">
-            <animate
-                attributeName="height"
-                attributeType="XML"
-                dur="1s"
-                values="15; 50; 15"
-                repeatCount="indefinite"/>
-          </rect>
-          <rect x="8.5" fill="#fff" width="1.5" height="50" transform="translate(0) rotate(180 10 25)">
-            <animate
-                attributeName="height"
-                attributeType="XML"
-                dur="1s"
-                values="15; 50; 15"
-                repeatCount="indefinite"
-                begin="0.1s"/>
-          </rect>
-          <rect x="20" fill="#fff" width="1.5" height="50" transform="translate(0) rotate(180 20 25)">
-            <animate
-                attributeName="height"
-                attributeType="XML"
-                dur="1s"
-                values="15; 50; 15"
-                repeatCount="indefinite"
-                begin="0.3s"/>
-          </rect>
-          <rect x="30" fill="#fff" width="1.5" height="50" transform="translate(0) rotate(180 29 25)">
-            <animate
-                attributeName="height"
-                attributeType="XML"
-                dur="1s"
-                values="15; 50; 15"
-                repeatCount="indefinite"
-                begin="0.5s"/>
-          </rect>
-          <rect x="40" fill="#fff" width="1.5" height="50" transform="translate(0) rotate(180 38 25)">
-            <animate
-                attributeName="height"
-                attributeType="XML"
-                dur="1s"
-                values="15; 50; 15"
-                repeatCount="indefinite"
-                begin="0.1s"/>
-          </rect>
-        </svg>        
+            <svg
+              version="1.1"
+              id="Layer_1"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              x="0px"
+              y="0px"
+              viewBox="0 0 50 50"
+              enable-background="new 0 0 50 50"
+              xml:space="preserve"
+              width="50"
+              height="50"
+            >
+              <rect
+                fill="#fff"
+                width="1.5"
+                height="50"
+                transform="translate(0) rotate(180 1.5 25)"
+              >
+                <animate
+                  attributeName="height"
+                  attributeType="XML"
+                  dur="1s"
+                  values="15; 50; 15"
+                  repeatCount="indefinite"
+                />
+              </rect>
+              <rect
+                x="8.5"
+                fill="#fff"
+                width="1.5"
+                height="50"
+                transform="translate(0) rotate(180 10 25)"
+              >
+                <animate
+                  attributeName="height"
+                  attributeType="XML"
+                  dur="1s"
+                  values="15; 50; 15"
+                  repeatCount="indefinite"
+                  begin="0.1s"
+                />
+              </rect>
+              <rect
+                x="20"
+                fill="#fff"
+                width="1.5"
+                height="50"
+                transform="translate(0) rotate(180 20 25)"
+              >
+                <animate
+                  attributeName="height"
+                  attributeType="XML"
+                  dur="1s"
+                  values="15; 50; 15"
+                  repeatCount="indefinite"
+                  begin="0.3s"
+                />
+              </rect>
+              <rect
+                x="30"
+                fill="#fff"
+                width="1.5"
+                height="50"
+                transform="translate(0) rotate(180 29 25)"
+              >
+                <animate
+                  attributeName="height"
+                  attributeType="XML"
+                  dur="1s"
+                  values="15; 50; 15"
+                  repeatCount="indefinite"
+                  begin="0.5s"
+                />
+              </rect>
+              <rect
+                x="40"
+                fill="#fff"
+                width="1.5"
+                height="50"
+                transform="translate(0) rotate(180 38 25)"
+              >
+                <animate
+                  attributeName="height"
+                  attributeType="XML"
+                  dur="1s"
+                  values="15; 50; 15"
+                  repeatCount="indefinite"
+                  begin="0.1s"
+                />
+              </rect>
+            </svg>
           </div>
           <span class="block text-white text-center mt-4"
             >Updating database, please wait...</span

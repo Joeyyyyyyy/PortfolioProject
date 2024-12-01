@@ -251,8 +251,6 @@ function closeModal() {
   
     confirmationModal.style.display = "none";
     loadingModal.style.display = "flex";
-
-    location.reload();
   
     try {
       const response = await fetch("/api/submit_transactions", {
@@ -282,6 +280,7 @@ function closeModal() {
     }
   
     closeModal(); // Close the modal after confirmation
+    location.reload();
   }
   
 
