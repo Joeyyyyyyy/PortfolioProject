@@ -5,6 +5,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     try {
         fetchPortfolioData(); // Always fetch data once when the page loads
+
         checkMarketStatus(); // Start checking market status periodically
     } catch (error) {
         console.error("Error during initialization:", error);
@@ -90,6 +91,7 @@ function startPeriodicFetch() {
  */
 async function fetchPortfolioData() {
     try {
+        
         const response = await fetch("/api/portfolio_data", {
             headers: {
                 "x-api-key": API_KEY
@@ -105,6 +107,11 @@ async function fetchPortfolioData() {
         updateOneDayReturns(data.todays_returns);
         updateHeldStocks(data.held_stocks);
         updateSoldStocks(data.sold_stocks);
+
+        document.getElementById('loader-container').style.display = 'none';
+        document.getElementById('loader-container2').style.display = 'none';
+        document.getElementById('portfolio-table').classList.remove('hidden');
+        document.getElementById('soldTable').classList.remove('hidden');
 
         console.log("Portfolio data fetched successfully.");
     } catch (error) {
@@ -193,20 +200,25 @@ function updateSoldStocks(stocks) {
 }
 
 /**
- * Filters the table based on the search input.
+ * Filters both tables based on the search input.
  */
 function searchTable() {
     const searchValue = document.getElementById("search-input").value.toLowerCase();
 
-    const rows = document.querySelectorAll("#portfolio-table tbody tr");
+    // Table 1: Portfolio Table (Filter by Share column)
+    const portfolioRows = document.querySelectorAll("#portfolio-table tbody tr");
+    portfolioRows.forEach(row => {
+        const shareCell = row.cells[0] ? row.cells[0].textContent.toLowerCase() : "";
+        row.style.display = shareCell.includes(searchValue) ? "" : "none";
+    });
 
-    rows.forEach(row => {
-        const shareCell = row.cells[0].textContent.toLowerCase();
+    const searchValue2 = document.getElementById("search-input-2").value.toLowerCase();
 
-        if (shareCell.includes(searchValue)) {
-            row.style.display = ""; 
-        } else {
-            row.style.display = "none"; 
-        }
+    // Table 2: Sold Table (Filter by Stock Code column)
+    const stockRows = document.querySelectorAll("#soldTable tbody tr");
+    stockRows.forEach(row => {
+        const stockCodeCell = row.cells[2] ? row.cells[2].textContent.toLowerCase() : "";
+        row.style.display = stockCodeCell.includes(searchValue2) ? "" : "none";
     });
 }
+

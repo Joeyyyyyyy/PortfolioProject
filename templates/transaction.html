@@ -7,226 +7,9 @@
       href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="/static/transaction.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <title>My Transactions</title>
-    <style>
-      body {
-        font-family: "Arial", sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #374151;
-      }
-      .container {
-        max-width: 1200px;
-        margin: 50px auto;
-        padding: 20px;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      }
-      h1 {
-        text-align: center;
-        margin-bottom: 20px;
-        color: #333;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        overflow-x: auto;
-      }
-      table thead {
-        background-color: #007bff;
-        color: white;
-        text-align: center;
-        margin: 0 auto;
-      }
-      table th,
-      table td {
-        padding: 12px 15px;
-        text-align: center;
-        border: 1px solid #ddd;
-      }
-      table th {
-        text-transform: uppercase;
-        text-align: center;
-        width: auto;
-      }
-      table tbody tr:nth-child(even) {
-        background-color: #f2f2f2;
-      }
-      table tbody tr:hover {
-        background-color: #f1f7ff;
-        cursor: pointer;
-      }
-      .action-btn {
-        background-color: red;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 5px 10px;
-        cursor: pointer;
-      }
-      .button-container {
-        text-align: center;
-        margin-top: 20px;
-      }
-      .add-btn,
-      #submit-btn,
-      #reset-btn {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 10px 15px;
-        cursor: pointer;
-        margin: 10px;
-      }
-      #submit-btn {
-        background-color: green;
-        display: none;
-      }
-      #reset-btn {
-        background-color: grey;
-        display: none;
-      }
-      input[type="date"] {
-        padding: 5px;
-        font-size: 14px;
-        width: 90%;
-        box-sizing: border-box;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-      }
-      select {
-        padding: 5px;
-        font-size: 14px;
-        width: 90%;
-        box-sizing: border-box;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-      }
-      #confirmation-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .modal-content {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        width: 80%;
-        max-width: 500px;
-        text-align: center;
-      }
-
-      /* General reset for smaller screens */
-      @media (max-width: 1200px) {
-        .container {
-          max-width: 90%;
-          margin: 30px auto;
-          padding: 15px;
-        }
-
-        table th,
-        table td {
-          padding: 10px 8px;
-          font-size: 14px;
-        }
-
-        .add-btn,
-        #submit-btn,
-        #reset-btn {
-          padding: 8px 12px;
-          font-size: 14px;
-        }
-
-        input[type="date"],
-        select {
-          font-size: 13px;
-        }
-      }
-
-      @media (max-width: 992px) {
-        /* Adjust table layout for medium-sized screens */
-        table th,
-        table td {
-          padding: 8px 5px;
-          font-size: 12px;
-        }
-
-        .add-btn,
-        #submit-btn,
-        #reset-btn {
-          padding: 6px 10px;
-          font-size: 12px;
-        }
-
-        h1 {
-          font-size: 22px;
-        }
-      }
-
-      @media (max-width: 768px) {
-        /* Stack table rows on smaller screens */
-        table {
-          display: block;
-          overflow-x: auto;
-          white-space: nowrap;
-        }
-
-        h1 {
-          font-size: 20px;
-          margin-bottom: 15px;
-        }
-
-        .container {
-          padding: 10px;
-          box-shadow: none;
-        }
-
-        .button-container {
-          margin-top: 15px;
-        }
-      }
-
-      @media (max-width: 576px) {
-        /* Optimize layout for very small screens */
-        table th,
-        table td {
-          padding: 6px 4px;
-          font-size: 11px;
-        }
-
-        .add-btn,
-        #submit-btn,
-        #reset-btn {
-          padding: 4px 8px;
-          font-size: 10px;
-        }
-
-        input[type="date"],
-        select {
-          font-size: 11px;
-          width: 100%;
-        }
-
-        h1 {
-          font-size: 18px;
-          margin-bottom: 10px;
-        }
-
-        .container {
-          margin: 20px 10px;
-        }
-      }
-    </style>
   </head>
   <body>
     <!--NAVBAR-->
@@ -313,7 +96,32 @@
     </nav>
 
     <div class="container">
-      <h1 style="font-weight: 800">My Transactions</h1>
+      <!-- Flex Container for Button and Heading -->
+      <div class="flex items-center my-3 space-x-4">
+        <a href="/stockDisplay">
+          <button
+            type="button"
+            class="text-black-700 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-3 py-2 text-center inline-flex items-center dark:hover:bg-gray-200 dark:focus:ring-gray-200"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 -3 27 29"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+              />
+            </svg>
+          </button>
+        </a>
+        <h1 class="text-xl font-extrabold">My Transactions</h1>
+      </div>
+
       <table id="editable-table">
         <thead>
           <tr>
@@ -334,6 +142,7 @@
       </table>
       <div class="button-container">
         <button class="add-btn" onclick="addRow()">Add Row</button>
+
         <button id="submit-btn" onclick="submitChanges()">
           Submit Changes
         </button>
@@ -341,310 +150,189 @@
           Reset
         </button>
       </div>
-      <div id="confirmation-modal" style="display: none">
-        <div class="modal-content">
-          <h2>Confirm Changes</h2>
-          <div id="changes-summary"></div>
-          <button id="confirm-sub" onclick="confirmSubmission()">
-            Confirm
-          </button>
-          <button id="cancel-sub" onclick="closeModal()">Cancel</button>
+
+      <!--MODAL-->
+      <div
+        id="confirmation-modal"
+        tabindex="-1"
+        aria-hidden="true"
+        class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-50 flex justify-center items-center"
+      >
+        <div
+          class="relative w-full max-w-md bg-white rounded-lg shadow-lg dark:bg-gray-800"
+        >
+          <!-- Modal Header -->
+          <div
+            id="modal-content"
+            class="flex justify-between items-center p-5 border-b rounded-t dark:border-gray-700"
+          >
+            <h3 class="text-xl font-medium text-gray-900 dark:text-white">
+              Confirm Changes
+            </h3>
+            <button
+              type="button"
+              class="text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              onclick="cancelModal()"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+          <!-- Modal Body -->
+          <div class="p-6 space-y-4">
+            <p class="text-sm text-gray-600 dark:text-gray-300">
+              Please review the changes you have made:
+            </p>
+            <div id="changes-summary" class="bg-gray-100 p-4 rounded-lg"></div>
+          </div>
+          <!-- Modal Footer -->
+          <div
+            class="flex justify-end items-center space-x-2 p-4 border-t border-gray-200 dark:border-gray-700"
+          >
+            <button
+              id="cancel-sub"
+              type="button"
+              class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+              onclick="closeModal()"
+            >
+              Cancel
+            </button>
+            <button
+              id="confirm-sub"
+              type="button"
+              class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400"
+              onclick="confirmSubmission()"
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+      <!--END MODAL-->
+      <!-- Loading Modal -->
+      <div
+        id="loading-modal"
+        class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-50 flex justify-center items-center"
+      >
+        <div
+          class="relative w-full max-w-md bg-white rounded-lg shadow-lg dark:bg-gray-800 p-6"
+        >
+          <h3 class="text-xl font-medium text-gray-900 dark:text-white mb-4">
+            Submitting Changes...
+          </h3>
+          <div class="flex justify-center items-center">
+            <svg
+              version="1.1"
+              id="Layer_1"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              x="0px"
+              y="0px"
+              viewBox="0 0 50 50"
+              enable-background="new 0 0 50 50"
+              xml:space="preserve"
+              width="50"
+              height="50"
+            >
+              <rect
+                fill="#fff"
+                width="1.5"
+                height="50"
+                transform="translate(0) rotate(180 1.5 25)"
+              >
+                <animate
+                  attributeName="height"
+                  attributeType="XML"
+                  dur="1s"
+                  values="15; 50; 15"
+                  repeatCount="indefinite"
+                />
+              </rect>
+              <rect
+                x="8.5"
+                fill="#fff"
+                width="1.5"
+                height="50"
+                transform="translate(0) rotate(180 10 25)"
+              >
+                <animate
+                  attributeName="height"
+                  attributeType="XML"
+                  dur="1s"
+                  values="15; 50; 15"
+                  repeatCount="indefinite"
+                  begin="0.1s"
+                />
+              </rect>
+              <rect
+                x="20"
+                fill="#fff"
+                width="1.5"
+                height="50"
+                transform="translate(0) rotate(180 20 25)"
+              >
+                <animate
+                  attributeName="height"
+                  attributeType="XML"
+                  dur="1s"
+                  values="15; 50; 15"
+                  repeatCount="indefinite"
+                  begin="0.3s"
+                />
+              </rect>
+              <rect
+                x="30"
+                fill="#fff"
+                width="1.5"
+                height="50"
+                transform="translate(0) rotate(180 29 25)"
+              >
+                <animate
+                  attributeName="height"
+                  attributeType="XML"
+                  dur="1s"
+                  values="15; 50; 15"
+                  repeatCount="indefinite"
+                  begin="0.5s"
+                />
+              </rect>
+              <rect
+                x="40"
+                fill="#fff"
+                width="1.5"
+                height="50"
+                transform="translate(0) rotate(180 38 25)"
+              >
+                <animate
+                  attributeName="height"
+                  attributeType="XML"
+                  dur="1s"
+                  values="15; 50; 15"
+                  repeatCount="indefinite"
+                  begin="0.1s"
+                />
+              </rect>
+            </svg>
+          </div>
+          <span class="block text-white text-center mt-4"
+            >Updating database, please wait...</span
+          >
         </div>
       </div>
     </div>
-    <script>
-      let isModified = false;
-
-      const apiUrl = "/api/transactionLogs"; // API endpoint for transaction logs
-
-      async function fetchTransactions() {
-        try {
-          const response = await fetch(apiUrl, {
-            headers: {
-              "x-api-key": "joel09-02-2024Adh",
-            },
-          });
-
-          if (!response.ok) {
-            // pass
-          }
-
-          const data = await response.json();
-          if ('error' in data) {
-            console.log("No data available:", data.error);
-          } else {
-            populateTable(data);
-          }
-        } catch (error) {
-          alert("Failed to load transactions.");
-          console.error(error);
-        }
-      }
-
-      function populateTable(transactions) {
-        const tbody = document
-          .getElementById("editable-table")
-          .querySelector("tbody");
-
-        transactions.forEach((transaction) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-                    <td>${transaction["Sl.No."]}</td>
-                    <td><input type="date" value="${formatDate(
-                      transaction.Date
-                    )}"></td>
-                    <td contenteditable="true">${transaction.Share}</td>
-                    <td contenteditable="true">${transaction.Symbol}</td>
-                    <td>
-                        <select>
-                            <option value="Buy" ${
-                              transaction.Transaction === "Buy"
-                                ? "selected"
-                                : ""
-                            }>Buy</option>
-                            <option value="Sell" ${
-                              transaction.Transaction === "Sell"
-                                ? "selected"
-                                : ""
-                            }>Sell</option>
-                        </select>
-                    </td>
-                    <td contenteditable="true">${transaction.Count}</td>
-                    <td contenteditable="true">${transaction.Price}</td>
-                    <td>${transaction["Total Amount"]}</td>
-                    <td>
-                        <button class="action-btn" onclick="deleteRow(this)">Delete</button>
-                    </td>
-                `;
-          tbody.appendChild(row);
-        });
-      }
-
-      function formatDate(dateStr) {
-        const date = new Date(dateStr);
-        return date.toISOString().split("T")[0]; // YYYY-MM-DD
-      }
-
-      function addRow() {
-        const tbody = document
-          .getElementById("editable-table")
-          .querySelector("tbody");
-        const lastRow = tbody.lastElementChild;
-        const lastSlNo = lastRow
-          ? parseInt(lastRow.querySelector("td:first-child").textContent)
-          : 0;
-
-        const row = document.createElement("tr");
-        row.innerHTML = `
-                <td>${lastSlNo + 1}</td>
-                <td><input type="date"></td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td>
-                    <select>
-                        <option value="Buy">Buy</option>
-                        <option value="Sell">Sell</option>
-                    </select>
-                </td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td>0</td>
-                <td>
-                    <button class="action-btn" onclick="deleteRow(this)">Delete</button>
-                </td>
-            `;
-        tbody.appendChild(row);
-        markModified();
-      }
-
-      function deleteRow(button) {
-        const row = button.parentElement.parentElement;
-        row.remove();
-        markModified();
-      }
-
-      function markModified() {
-        isModified = true;
-        document.getElementById("submit-btn").style.display = "inline-block";
-        document.getElementById("reset-btn").style.display = "inline-block";
-      }
-
-      function calculateTotal(row) {
-        const countCell = row.querySelector("td:nth-child(6)");
-        const priceCell = row.querySelector("td:nth-child(7)");
-        const totalCell = row.querySelector("td:nth-child(8)");
-
-        const count = parseFloat(countCell.textContent) || 0;
-        const price = parseFloat(priceCell.textContent) || 0;
-
-        totalCell.textContent = (count * price).toFixed(2);
-      }
-
-      function handleCellChange(event) {
-        const cell = event.target;
-        const row = cell.parentElement;
-
-        // If count or price changes, update the total amount
-        if (cell.cellIndex === 5 || cell.cellIndex === 6) {
-          calculateTotal(row);
-        }
-
-        markModified();
-      }
-
-      document
-        .getElementById("editable-table")
-        .addEventListener("input", handleCellChange);
-
-      async function resetChanges() {
-        if (confirm("Are you sure you want to discard all changes?")) {
-          const tbody = document
-            .getElementById("editable-table")
-            .querySelector("tbody");
-          tbody.innerHTML = ""; // Clear the current table
-          await fetchTransactions(); // Reload the original data
-          isModified = false;
-          document.getElementById("submit-btn").style.display = "none";
-          document.getElementById("reset-btn").style.display = "none";
-        }
-      }
-
-      async function submitChanges() {
-        const rows = document.querySelectorAll("#editable-table tbody tr");
-        const transactions = [];
-        let hasErrors = false;
-        const changesSummary = [];
-
-        rows.forEach((row) => {
-          const cells = row.querySelectorAll("td");
-          const dateInput = cells[1].querySelector('input[type="date"]');
-          const dateValue = dateInput.value;
-
-          // Validate each field
-          const share = cells[2].textContent.trim();
-          const symbol = cells[3].textContent.trim();
-          const transactionType = cells[4].querySelector("select").value;
-          const count = parseFloat(cells[5].textContent.trim());
-          const price = parseFloat(cells[6].textContent.trim());
-
-          if (
-            !dateValue ||
-            !share ||
-            !symbol ||
-            !transactionType ||
-            isNaN(count) ||
-            isNaN(price) ||
-            count <= 0 ||
-            price <= 0
-          ) {
-            // Highlight the row with errors
-            row.style.backgroundColor = "#ffcccc"; // Red background for error
-            hasErrors = true;
-          } else {
-            // Reset row color if no error
-            row.style.backgroundColor = "";
-          }
-
-          // Only add valid rows to the transactions list
-          if (!hasErrors) {
-            const formattedDate = formatDateForSubmit(dateValue);
-
-            const transaction = {
-              "Sl.No.": parseFloat(cells[0].textContent.trim(), 10),
-              Date: formattedDate,
-              Share: share,
-              Symbol: symbol,
-              Transaction: transactionType,
-              Count: count,
-              Price: price,
-              "Total Amount": parseFloat(cells[7].textContent.trim()) || 0,
-            };
-            transactions.push(transaction);
-
-            changesSummary.push(`
-                        <p><strong>Row ${cells[0].textContent.trim()}:</strong> 
-                        ${transaction.Share} (${transaction.Symbol}) - 
-                        ${transaction.Transaction} ${transaction.Count} at ${
-              transaction.Price
-            }</p>
-                    `);
-          }
-        });
-
-        if (hasErrors) {
-          setTimeout(() => {
-            alert("Please correct the highlighted rows before submitting.");
-          }, 0);
-          return; // Stop submission
-        }
-
-        // Show confirmation modal with changes summary
-        document.getElementById("confirm-sub").style.display = "inline-block";
-        document.getElementById("cancel-sub").style.display = "inline-block";
-        document.getElementById("changes-summary").innerHTML =
-          changesSummary.join("");
-        document.getElementById("confirmation-modal").style.display = "flex";
-
-        // Store transactions globally for later confirmation
-        window.pendingTransactions = transactions;
-      }
-
-      async function confirmSubmission() {
-        const modalTitle = document.querySelector(
-          "#confirmation-modal .modal-content h2"
-        );
-        modalTitle.textContent = "Updating database...";
-        const changesSummary = document.getElementById("changes-summary");
-        changesSummary.innerHTML = "";
-
-        document.getElementById("confirm-sub").style.display = "none";
-        document.getElementById("cancel-sub").style.display = "none";
-        try {
-          const response = await fetch("/api/submit_transactions", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": "joel09-02-2024Adh",
-            },
-            body: JSON.stringify(window.pendingTransactions),
-          });
-
-          if (response.ok) {
-            alert("Changes submitted successfully!");
-            document.getElementById("confirmation-modal").style.display =
-              "none";
-            isModified = false;
-            document.getElementById("submit-btn").style.display = "none";
-            document.getElementById("reset-btn").style.display = "none";
-          } else {
-            document.getElementById("confirmation-modal").style.display =
-              "none";
-            const error = await response.json();
-            alert(`Error: ${error.error}`);
-          }
-        } catch (error) {
-          document.getElementById("confirmation-modal").style.display = "none";
-          console.error("Failed to submit transactions:", error);
-          alert("Failed to submit changes. Please try again.");
-        }
-      }
-
-      function closeModal() {
-        document.getElementById("confirmation-modal").style.display = "none";
-      }
-
-      // Utility function to format date to dd-mm-yyyy
-      function formatDateForSubmit(dateStr) {
-        const date = new Date(dateStr);
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-        return `${day}-${month}-${year}`;
-      }
-
-      // Fetch transactions on page load
-      fetchTransactions();
-    </script>
+    <script src="static/transaction.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
   </body>
 </html>
