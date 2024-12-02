@@ -212,6 +212,7 @@ class StockPortfolio:
         
         for row in sell.itertuples(index=True):
             slno = row[1]
+            sell_date = row.Date
             sell_count = row.Count
             sell_price = row.Price
             # Access Total Sell Amount properly
@@ -224,7 +225,7 @@ class StockPortfolio:
             profit = 0
             
             # Filter buys that occurred before the sell transaction and sort by date for FIFO
-            prior_buys = self.buys[self.buys['Sl.No.'] < slno].sort_values(by='Date')
+            prior_buys = self.buys[self.buys['Date'] < sell_date].sort_values(by='Date')
             prior_buys = prior_buys[prior_buys['Symbol']==row[4]]
             
             for idx, buy_row in prior_buys.iterrows():
