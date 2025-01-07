@@ -236,6 +236,8 @@ select {
   max-width: 500px;
   width: 100%;
   box-sizing: border-box;
+  max-height: 300px; /* Adjust the height as needed */
+  overflow-y: auto; 
 }
 
 .loader {
