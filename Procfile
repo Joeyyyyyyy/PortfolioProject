@@ -1,1 +1,1 @@
-web: python -m waitress --port=$PORT app:app
+web: python -m waitress --port=$PORT --threads=6 app:app
