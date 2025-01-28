@@ -11,6 +11,5 @@ venv
 # Ignore Google Cloud credentials file
 .env
 
-# Ignore Test file
-test1.py
-test2.py
+# Ignore Test folder
+test/
