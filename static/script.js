@@ -116,7 +116,6 @@ async function fetchPortfolioData() {
         console.log("Portfolio data fetched successfully.");
     } catch (error) {
         console.error("Error fetching portfolio data:", error);
-        location.reload();
     }
     searchTable();
 }
