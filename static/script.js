@@ -120,29 +120,55 @@ async function fetchPortfolioData() {
     searchTable();
 }
 
-/**
- * Updates the realized profit section.
- * @param {number} profit - Realized profit value.
- */
 function updateRealizedProfit(profit) {
-    document.getElementById("realized-profit").textContent = `${profit.toFixed(2)}`;
+    const el = document.getElementById("realized-profit");
+
+    // Remove both possible text colors first, to keep things clean
+    el.classList.remove("text-[#15803D]", "text-red-500");
+
+    // Add the correct color class based on sign
+    if (profit < 0) {
+        el.classList.add("text-red-500");
+    } else {
+        el.classList.add("text-[#15803D]");
+    }
+
+    // Set the final text (and optionally format it)
+    el.textContent = profit.toFixed(2);
 }
 
-/**
- * Updates the unrealized profit section.
- * @param {number} profit - Unrealized profit value.
- */
 function updateUnrealizedProfit(profit) {
-    document.getElementById("unrealized-profit").textContent = `${profit.toFixed(2)}`;
+    const el = document.getElementById("unrealized-profit");
+
+    // Remove both possible text colors first
+    el.classList.remove("text-[#15803D]", "text-red-500");
+
+    // Add color class
+    if (profit < 0) {
+        el.classList.add("text-red-500");
+    } else {
+        el.classList.add("text-[#15803D]");
+    }
+
+    el.textContent = profit.toFixed(2);
 }
 
-/**
- * Updates the one day returns section.
- * @param {number} returns - One day returns value.
- */
 function updateOneDayReturns(returns) {
-    document.getElementById("todays-returns").textContent = `${returns.toFixed(2)}`;
+    const el = document.getElementById("todays-returns");
+
+    // Remove both possible text colors first
+    el.classList.remove("text-[#15803D]", "text-red-500");
+
+    // Add color class
+    if (returns < 0) {
+        el.classList.add("text-red-500");
+    } else {
+        el.classList.add("text-[#15803D]");
+    }
+
+    el.textContent = returns.toFixed(2);
 }
+
 
 /**
  * Updates the held stocks table.
