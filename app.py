@@ -305,21 +305,21 @@ class StockPortfolioAPI:
                         "sold_stocks": g.portfolio.getSoldStocksData().to_dict(orient="records") if g.portfolio.getSoldStocksData() is not None else []
                     }
                 transactionstring = g.df.to_string()
-                prompt="""You are Toro, a bull of the Dalal Street, a stock market genius AI that has immense knowledge in this field.
+                prompt="""System Prompt: You are Toro, a bull of the Dalal Street, a stock market genius AI that has immense knowledge in this field.
                     You talk in a very casual, proud, high-energy, money-hungry, bullish and friendly way like you are Jordan Belfort from Wolf of the Wall Street but a family friendly version who does not cuss.
-                    Introduce yourself first. Then give a disclaimer that you're not a SEBI registered advisor and you're just Toro.
-                    Now be very elaborate in these responses:-
-                    Then, comment on my transactions and trading pattern elaborately. What do you think my nature and mindset is?
-                    You can assess the sectors, these companies, my style of investments,etc. 
-                    Comment on my currently held shares and today's movements too. Whos is today's biggest loser and biggest winner? What might be going on?
-                    Do some calculations and give me a rough idea about my profits future prospects.
-                    Give me detailed advise and plan of action too. Toro's golden rules (not more than 3) that are pertinent to me.
-                    My transactions:\n"""
+                    Introduce yourself first. Then give a disclaimer that you're not a SEBI registered advisor and you're just Toro who can make mistakes and you're advise is just for educational and informative purposes.
+                    Now be very elaborate in your responses to the following:-
+                    Comment on my transactions and trading pattern elaborately. What do you think my nature and mindset is? My transactions are generally in rupees only.
+                    You can assess the sectors, these companies, my style of investments ,etc. 
+                    Comment on my currently held shares and today's movements too. Who is today's biggest loser and biggest winner? What might be going on?
+                    Talk about future prospects and any suggested shares i can look into?
+                    Give me detailed advise and plan of action too. Give me Toro's golden rules (not more than 3) that are pertinent to me. Also explain one random stock market term.\n\n
+                    My Data:\n\nMy transactions:\n"""
                 if my_data is not None:
                     print("Generating AI advise")
                     prompt+= transactionstring+"""\n\n\n My currently held stocks: 
                     (Data in the order: Name, Net Shares, Avg Buying Price, Current Price, Potential Sale Value, Day Gain, Today's % Change, Unrealised P/L):\n"""
-                    prompt += str(my_data["held_stocks"])
+                    prompt += str(my_data["held_stocks"])+"\n\nRealised Profit: "+str(my_data["realized_profit"])+"\n\nUnrealised Profit: "+str(my_data["unrealized_profit"])+"\n\nToday's P&L: "+str(my_data["todays_returns"])
                     client = genai.Client(api_key = self.genai_key)
                     response = client.models.generate_content(
                         model="gemini-2.0-flash", contents=prompt
