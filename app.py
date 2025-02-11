@@ -1,9 +1,11 @@
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request, render_template, redirect, url_for, session, flash, g
 from StockPortfolio import StockPortfolio,MarketStatus
 import os
 from typing import Optional
 from admin import StockTransactionManager
 from datetime import datetime,timezone
+from google import genai
 
 class StockPortfolioAPI:
     def __init__(self) -> None:
@@ -17,6 +19,8 @@ class StockPortfolioAPI:
         self.app.secret_key = "secret_key"  # Required for session management
         self.api_key: str = "joel09-02-2024Adh"  # Hardcoded API key
         self.setup_routes()  # Initialize all routes
+        load_dotenv()
+        self.genai_key = os.getenv("GENAI_API")
 
     def setup_routes(self) -> None:
         """
@@ -279,6 +283,53 @@ class StockPortfolioAPI:
             except Exception as e:
                 
                 return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+        @self.app.route("/api/advise", methods=["GET"])
+        def get_advise():
+            
+            #if not self.is_authorized(request):
+                #return jsonify({"error": "Unauthorized"}), 403
+
+            try:
+                # Initialize and prepare portfolio
+                g.admindb = StockTransactionManager()
+                g.admindb.login(username=session["user"], password=session["password"])
+                g.df = g.admindb.transactions_to_dataframe()
+                g.portfolio = StockPortfolio(user=session["user"], dataframe=g.df)
+                g.portfolio.run()
+                my_data = {
+                        "realized_profit": g.portfolio.getRealisedProfit(),
+                        "unrealized_profit": g.portfolio.getUnrealisedProfit(),
+                        "todays_returns": g.portfolio.getOneDayReturns(),
+                        "held_stocks": g.portfolio.getHeldStocks().to_dict(orient="records") if g.portfolio.getHeldStocks() is not None else [],
+                        "sold_stocks": g.portfolio.getSoldStocksData().to_dict(orient="records") if g.portfolio.getSoldStocksData() is not None else []
+                    }
+                transactionstring = g.df.to_string()
+                prompt="""You are Toro, a bull of the Dalal Street, a stock market genius AI that has immense knowledge in this field.
+                    You talk in a very casual, proud, high-energy, money-hungry, bullish and friendly way like you are Jordan Belfort from Wolf of the Wall Street but a family friendly version who does not cuss.
+                    Introduce yourself first. Then give a disclaimer that you're not a SEBI registered advisor and you're just Toro.
+                    Now be very elaborate in these responses:-
+                    Then, comment on my transactions and trading pattern elaborately. What do you think my nature and mindset is?
+                    You can assess the sectors, these companies, my style of investments,etc. 
+                    Comment on my currently held shares and today's movements too. Whos is today's biggest loser and biggest winner? What might be going on?
+                    Do some calculations and give me a rough idea about my profits future prospects.
+                    Give me detailed advise and plan of action too. Toro's golden rules (not more than 3) that are pertinent to me.
+                    My transactions:\n"""
+                if my_data is not None:
+                    print("Generating AI advise")
+                    prompt+= transactionstring+"""\n\n\n My currently held stocks: 
+                    (Data in the order: Name, Net Shares, Avg Buying Price, Current Price, Potential Sale Value, Day Gain, Today's % Change, Unrealised P/L):\n"""
+                    prompt += str(my_data["held_stocks"])
+                    client = genai.Client(api_key = self.genai_key)
+                    response = client.models.generate_content(
+                        model="gemini-2.0-flash", contents=prompt
+                    )
+                    return jsonify({"AIresponse": response.text})
+                return jsonify({"error": "No held stocks data available"}), 404
+            
+            except Exception as e:
+                # Handle errors gracefully
+                return jsonify({"error": str(e)}), 500
 
 
     def is_authorized(self, request) -> bool:
