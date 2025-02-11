@@ -6,6 +6,8 @@ from typing import Optional
 from admin import StockTransactionManager
 from datetime import datetime,timezone
 from google import genai
+from random_term import stock_terms
+import random
 
 class StockPortfolioAPI:
     def __init__(self) -> None:
@@ -296,7 +298,8 @@ class StockPortfolioAPI:
                 g.admindb.login(username=session["user"], password=session["password"])
                 g.df = g.admindb.transactions_to_dataframe()
                 g.portfolio = StockPortfolio(user=session["user"], dataframe=g.df)
-                g.portfolio.run()
+                g.portfolio.run()                
+                random_term = random.choice(stock_terms)
                 my_data = {
                         "realized_profit": g.portfolio.getRealisedProfit(),
                         "unrealized_profit": g.portfolio.getUnrealisedProfit(),
@@ -306,14 +309,16 @@ class StockPortfolioAPI:
                     }
                 transactionstring = g.df.to_string()
                 prompt="""System Prompt: You are Toro, a bull of the Dalal Street, a stock market genius AI that has immense knowledge in this field.
-                    You talk in a very casual, proud, high-energy, money-hungry, bullish and friendly way like you are Jordan Belfort from Wolf of the Wall Street but a family friendly version who does not cuss.
-                    Introduce yourself first. Then give a disclaimer that you're not a SEBI registered advisor and you're just Toro who can make mistakes and you're advise is just for educational and informative purposes.
-                    Now be very elaborate in your responses to the following:-
-                    Comment on my transactions and trading pattern elaborately. What do you think my nature and mindset is? My transactions are generally in rupees only.
-                    You can assess the sectors, these companies, my style of investments ,etc. 
-                    Comment on my currently held shares and today's movements too. Who is today's biggest loser and biggest winner? What might be going on?
-                    Talk about future prospects and any suggested shares i can look into?
-                    Give me detailed advise and plan of action too. Give me Toro's golden rules (not more than 3) that are pertinent to me. Also explain one random stock market term.\n\n
+                    You speak in a high-energy, bullish, money-hungry and confident tone—like Jordan Belfort, but family-friendly.
+                    Introduce yourself first. Then give a disclaimer that you're not a SEBI registered advisor and you're just Toro who can make mistakes and your advise is just for educational and informative purposes.
+                    \nNow, I want you to be VERY VERY ELABORATE(atleast 1000 words) IN YOUR ANSWERS FOR THESE QUESTIONS:-
+                    \n* Analyze my trading pattern: Comment on my transactions and what they reveal about my mindset. Identify any patterns in my style.
+                    \n* Sector & Company Insights: Break down my investments by sector and specific stocks.
+                    \n* Daily Performance Review: Identify today’s biggest loser and biggest winner. Explain possible reasons for their movements.
+                    \n* Future Prospects: Suggest potential stocks or sectors I should watch.
+                    \n* Actionable Advice: Give a detailed plan based on my portfolio.
+                    \n* Toro’s Golden Rules (3 max): Provide three key advises tailored to me."""
+                prompt += f"\n* Random Stock market term for today: Explain '{random_term}' concisely." +"""
                     My Data:\n\nMy transactions:\n"""
                 if my_data is not None:
                     print("Generating AI advise")
