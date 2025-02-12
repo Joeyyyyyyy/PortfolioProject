@@ -415,6 +415,7 @@ class StockPortfolio:
 class MarketStatus:
     def __init__(self):
         pass
+    
     def is_market_open(self):
         try:
             stock = yf.Ticker("^NSEI")
@@ -430,10 +431,38 @@ class MarketStatus:
         except:
             return False
         return False
+    
+    def market_movement_summary(self)->str:
+        # Fetching NIFTY50 and SENSEX data
+        nifty = yf.Ticker('^NSEI')
+        sensex = yf.Ticker('^BSESN')
+
+        nifty_today = nifty.history(period='5d')
+        sensex_today = sensex.history(period='5d')
+
+        if nifty_today.empty or sensex_today.empty:
+            return "Market data not available for today."
+
+        # Calculating the point changes
+        nifty_change = nifty_today['Close'].iloc[-1] - nifty_today['Close'].iloc[-2]
+        sensex_change = sensex_today['Close'].iloc[-1] - sensex_today['Close'].iloc[-2]
+
+
+        # Determining up/down movement
+        nifty_status = 'up' if nifty_change > 0 else 'down'
+        sensex_status = 'up' if sensex_change > 0 else 'down'
+
+        # Formatting date
+        today_date = datetime.now().strftime('%d/%m/%Y, %I:%M:%S %p')
+
+        # Generating the result string
+        result = (f"SENSEX is {sensex_status} by {abs(sensex_change):.2f} points while NIFTY50 is {nifty_status} "
+                f"by {abs(nifty_change):.2f} points today. Today's date and time: ({today_date})")
+
+        return result
 
 # Example usage:
 if __name__ == "__main__":
     file_path = 'DummyTransactions.xlsx'
-    portfolio = StockPortfolio(user="Dummy",file_path=file_path)
-    portfolio.driver()
-    print(portfolio.getHeldStocks().columns)
+    status=MarketStatus()
+    print(status.market_movement_summary())

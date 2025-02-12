@@ -300,22 +300,23 @@ class StockPortfolioAPI:
                 g.portfolio = StockPortfolio(user=session["user"], dataframe=g.df)
                 g.portfolio.run()                
                 random_term = random.choice(stock_terms)
+                g.status=MarketStatus()
                 my_data = {
                         "realized_profit": g.portfolio.getRealisedProfit(),
                         "unrealized_profit": g.portfolio.getUnrealisedProfit(),
                         "todays_returns": g.portfolio.getOneDayReturns(),
                         "held_stocks": g.portfolio.getHeldStocks().to_dict(orient="records") if g.portfolio.getHeldStocks() is not None else [],
-                        "sold_stocks": g.portfolio.getSoldStocksData().to_dict(orient="records") if g.portfolio.getSoldStocksData() is not None else []
+                        "indices": g.status.market_movement_summary()
                     }
                 transactionstring = g.df.to_string()
                 prompt="""System Prompt: You are Toro, a bull of the Dalal Street, a stock market genius AI that has immense knowledge in this field.
                     You speak in a high-energy, bullish, money-hungry and confident tone—like Jordan Belfort, but family-friendly.
                     Introduce yourself first. Then give a disclaimer that you're not a SEBI registered advisor and you're just Toro who can make mistakes and your advise is just for educational and informative purposes.
-                    \nNow, I want you to be VERY VERY ELABORATE(atleast 1000 words) IN YOUR ANSWERS FOR THESE QUESTIONS:-
+                    \n\nNow, I want you to be VERY VERY ELABORATE(atleast 1000 words) IN YOUR ANSWERS FOR THESE QUESTIONS:-
                     \n* Analyze my trading pattern: Comment on my transactions and what they reveal about my mindset. Identify any patterns in my style.
                     \n* Recent trade: Judge my most recent buy/sell
                     \n* Sector & Company Insights: Break down my investments by sector and specific stocks.
-                    \n* Daily Performance Review: Identify today’s biggest loser and biggest winner. Explain possible reasons for their movements.
+                    \n* Daily Performance Review: Identify today’s biggest loser and biggest winner. Explain possible reasons for their movements. Don't forget to take into account the index movements for analysing this. Don't forget that the market opens at around 9:30 AM and closes at around 3:30 PM. If the time is during market hours then you have to tailor your response accordingly.
                     \n* My favourite stock: Assess what is my favourite stock.
                     \n* Future Prospects: Suggest potential stocks or sectors I should keep a watch on.
                     \n* Actionable Advice: Give a detailed plan based on my portfolio.
@@ -326,7 +327,7 @@ class StockPortfolioAPI:
                     print("Generating AI advise")
                     prompt+= transactionstring+"""\n\n\n My currently held stocks: 
                     (Data in the order: Name, Net Shares, Avg Buying Price, Current Price, Potential Sale Value, Day Gain, Today's % Change, Unrealised P/L):\n"""
-                    prompt += str(my_data["held_stocks"])+"\n\nRealised Profit: "+str(my_data["realized_profit"])+"\n\nUnrealised Profit: "+str(my_data["unrealized_profit"])+"\n\nToday's P&L: "+str(my_data["todays_returns"])
+                    prompt += str(my_data["held_stocks"])+"\n\nRealised Profit: "+str(my_data["realized_profit"])+"\n\nUnrealised Profit: "+str(my_data["unrealized_profit"])+"\n\nToday's P&L: "+str(my_data["todays_returns"])+"\n\n"+str(my_data["indices"])
                     client = genai.Client(api_key = self.genai_key)
                     response = client.models.generate_content(
                         model="gemini-2.0-flash", contents=prompt
