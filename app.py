@@ -313,9 +313,11 @@ class StockPortfolioAPI:
                     Introduce yourself first. Then give a disclaimer that you're not a SEBI registered advisor and you're just Toro who can make mistakes and your advise is just for educational and informative purposes.
                     \nNow, I want you to be VERY VERY ELABORATE(atleast 1000 words) IN YOUR ANSWERS FOR THESE QUESTIONS:-
                     \n* Analyze my trading pattern: Comment on my transactions and what they reveal about my mindset. Identify any patterns in my style.
+                    \n* Recent trade: Judge my most recent buy/sell
                     \n* Sector & Company Insights: Break down my investments by sector and specific stocks.
                     \n* Daily Performance Review: Identify today’s biggest loser and biggest winner. Explain possible reasons for their movements.
-                    \n* Future Prospects: Suggest potential stocks or sectors I should watch.
+                    \n* My favourite stock: Assess what is my favourite stock.
+                    \n* Future Prospects: Suggest potential stocks or sectors I should keep a watch on.
                     \n* Actionable Advice: Give a detailed plan based on my portfolio.
                     \n* Toro’s Golden Rules (3 max): Provide three key advises tailored to me."""
                 prompt += f"\n* Random Stock market term for today: Explain '{random_term}' concisely." +"""
