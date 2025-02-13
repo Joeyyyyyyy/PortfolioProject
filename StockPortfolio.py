@@ -454,10 +454,13 @@ class MarketStatus:
 
         # Formatting date
         today_date = datetime.now().strftime('%d/%m/%Y, %I:%M:%S %p')
+        
+        open=self.is_market_open()
+        open_or_close = "open."if open else "closed."
 
         # Generating the result string
         result = (f"SENSEX is {sensex_status} by {abs(sensex_change):.2f} points while NIFTY50 is {nifty_status} "
-                f"by {abs(nifty_change):.2f} points today. Today's date and time: ({today_date})")
+                f"by {abs(nifty_change):.2f} points today. Today's date and time: ({today_date})."+" Market is "+open_or_close)
 
         return result
 
