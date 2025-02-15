@@ -48,3 +48,13 @@ body {
 /* .container{
     background-color: #a2a2a2;
 } */
+
+
+#advice-container {
+    color: aliceblue;
+}
+
+.advice-box{
+    border: 2px solid rgb(51, 131, 99);
+}
+  
