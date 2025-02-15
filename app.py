@@ -289,8 +289,8 @@ class StockPortfolioAPI:
         @self.app.route("/api/advise", methods=["GET"])
         def get_advise():
             
-            #if not self.is_authorized(request):
-                #return jsonify({"error": "Unauthorized"}), 403
+            if not self.is_authorized(request):
+                return jsonify({"error": "Unauthorized"}), 403
 
             try:
                 # Initialize and prepare portfolio
