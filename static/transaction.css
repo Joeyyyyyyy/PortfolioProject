@@ -259,8 +259,7 @@ select {
   .modal-content {
     padding: 15px;
     max-width: 90%;
-=======
-  
+  }  
   /* General reset for smaller screens */
   @media (max-width: 1200px) {
     .container {
@@ -498,4 +497,4 @@ select {
       font-size: 12px;
     }
   }
-  
+} 

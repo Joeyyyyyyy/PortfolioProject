@@ -247,3 +247,22 @@ function searchTable() {
     });
 }
 
+
+document.addEventListener("DOMContentLoaded", function() {
+    fetch('http://localhost:8000/api/advise')
+      .then(response => response.json())
+      .then(data => {
+        if (data.AIresponse) {
+          // Convert markdown to HTML using Showdown
+          const converter = new showdown.Converter();
+          const htmlContent = converter.makeHtml(data.AIresponse);
+          document.getElementById('advice-container').innerHTML = htmlContent;
+        } else {
+          throw new Error("Response missing AIresponse key");
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching advice:', error);
+        document.getElementById('advice-container').innerHTML = 'Error loading advice.';
+      });
+  });
