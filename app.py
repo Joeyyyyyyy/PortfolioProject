@@ -310,21 +310,21 @@ class StockPortfolioAPI:
                     }
                 transactionstring = g.df.to_string()
                 prompt="""System Prompt: You are Toro, a bull living on the Dalal Street, a stock market genius AI that has immense knowledge in this field.
-                    You speak in a high-energy, bullish, money-hungry and confident tone—like Jordan Belfort, but family-friendly.\n\n
+                    You speak in a high-energy, smart, greedy, power-hungry and confident tone—like Jordan Belfort, but family-friendly.\n\n
                     Introduce yourself first. Then give a short disclaimer that you're not a SEBI registered advisor and you're just Toro who can make mistakes and your advise is just for educational and informative purposes.
                     Don't forget that the market usually opens at 9:30 AM and closes at 3:30 PM on weekdays. If the time is not during market hours then you have to tailor your response accordingly.
                     \n\nNow, I want you to be very elaborate for your answers to these questions and use a little relevant emojis. Add extra gaps between paragraphs too:-
-                    \n* Daily Performance Review: Identify today’s biggest loser and biggest winner. Explain possible reasons for their movements. Don't forget to take into account the index movements for analysing this. 
-                    \n* What is my favourite stock: Assess what is my favourite stock.
+                    \n* "Daily Performance Review": Identify today’s biggest loser (none if everyone had positive movement) and biggest winner (none if everyone had negative movement) based on % movements. Explain possible reasons for their movements. If market was closed today, then just say that this is (previous market date)'s data. Don't forget to take into account the index movements for analysing this. 
+                    \n* "Your favourite stock": Pick a random stock in my portfolio and tell me about it
                     \n* Your opinion on NIFTY50 and SENSEX movements.
-                    \n* Future Prospects: Suggest potential stocks or sectors I should keep a watch on.
-                    \n* Expectations: What do you think i should expect right now from the market (Answer this question only if the time right now is between 9:30 AM and 3:30 PM, otherwise ignore)
+                    \n* "Future Prospects": Suggest potential stocks or sectors I should keep a watch on.
+                    \n* "Expectations": What do you think i should expect right now from the market (Answer this question only if the time right now is between 9:30 AM and 3:30 PM, otherwise ignore)
                     """
-                prompt += f"\n* Random Stock market term for today: Explain '{random_term}' concisely." +"""
-                    My Data:\n\nMy transactions:\n"""
+                prompt += f"\n* \"Stock market term for today\": Explain '{random_term}' elaborately in two paragraphs. Write the first paragraph like I'm a 10year old kid and the second paragraph normally." +"""
+                    My Data:\n\n"""
                 if my_data is not None:
                     print("Generating AI advise")
-                    prompt+= transactionstring+"""\n\n\n My currently held stocks: 
+                    prompt+= """My currently held stocks: 
                     (Data in the order: Name, Net Shares, Avg Buying Price, Current Price, Potential Sale Value, Day Gain, Today's % Change, Unrealised P/L):\n"""
                     prompt += str(my_data["held_stocks"])+"\n\nRealised Profit: "+str(my_data["realized_profit"])+"\n\nUnrealised Profit: "+str(my_data["unrealized_profit"])+"\n\nToday's P&L: "+str(my_data["todays_returns"])+"\n\n"+str(my_data["indices"])
                     client = genai.Client(api_key = self.genai_key)
