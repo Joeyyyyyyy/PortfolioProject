@@ -41,7 +41,7 @@ class StockPortfolioAPI:
                            
             return render_template("index.html")
 
-        @self.app.route("/stockDisplay")
+        @self.app.route("/stock-display")
         def stock_display() -> str:
             """
             Render the stock display page.
@@ -63,7 +63,7 @@ class StockPortfolioAPI:
             else:
                 return redirect(url_for("login"))
                 
-            return render_template("stockDisplay.html")
+            return render_template("stock-display.html")
 
         @self.app.route("/login", methods=["GET", "POST"])
         def login() -> str:
