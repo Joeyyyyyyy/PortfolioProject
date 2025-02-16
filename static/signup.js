@@ -20,3 +20,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 50);
 });
+
+
+function validateForm() {
+  const password = document.getElementById('password').value;
+  const confirmPassword = document.getElementById('confirm-password').value;
+
+  if (password !== confirmPassword) {
+    alert("Passwords do not match!");
+    return false;
+  }
+  return true;
+}
+
+function togglePasswordVisibility(id) {
+  const passwordField = document.getElementById(id);
+  const eyeIcon = document.getElementById(id + '-eye-icon');
+
+  if (passwordField.type === "password") {
+    passwordField.type = "text";
+    eyeIcon.classList.remove("fa-eye-slash");
+    eyeIcon.classList.add("fa-eye");
+  } else {
+    passwordField.type = "password";
+    eyeIcon.classList.remove("fa-eye");
+    eyeIcon.classList.add("fa-eye-slash");
+  }
+}
