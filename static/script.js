@@ -247,22 +247,36 @@ function searchTable() {
     });
 }
 
-
-document.addEventListener("DOMContentLoaded", function() {
-    fetch('/api/advise')
-      .then(response => response.json())
-      .then(data => {
-        if (data.AIresponse) {
-          // Convert markdown to HTML using Showdown
-          const converter = new showdown.Converter();
-          const htmlContent = converter.makeHtml(data.AIresponse);
-          document.getElementById('advice-container').innerHTML = htmlContent;
-        } else {
-          throw new Error("Response missing AIresponse key");
+document.addEventListener("DOMContentLoaded", async function () {
+    const adviceContainer = document.getElementById('advice-container');
+    adviceContainer.innerHTML = 'Loading advice...';
+  
+    try {
+      // Fetch API response with API key header
+      const response = await fetch("/api/advise", {
+        headers: {
+          "x-api-key": API_KEY
         }
-      })
-      .catch(error => {
-        console.error('Error fetching advice:', error);
-        document.getElementById('advice-container').innerHTML = 'Error loading advice.';
       });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch AI response: ${response.status} ${response.statusText}`);
+      }
+  
+      // Parse JSON response
+      const data = await response.json();
+  
+      if (data.AIresponse) {
+        // Convert markdown to HTML using Showdown
+        const converter = new showdown.Converter({ sanitize: true });
+        const htmlContent = converter.makeHtml(data.AIresponse);
+        adviceContainer.innerHTML = htmlContent;
+      } else {
+        throw new Error("Response missing AIresponse key");
+      }
+    } catch (error) {
+      console.error('Error fetching advice:', error);
+      adviceContainer.innerHTML = 'Error loading advice. Please try again later.';
+    }
   });
+  
