@@ -249,7 +249,7 @@ function searchTable() {
 
 
 document.addEventListener("DOMContentLoaded", function() {
-    fetch('http://localhost:8000/api/advise')
+    fetch('/api/advise')
       .then(response => response.json())
       .then(data => {
         if (data.AIresponse) {
