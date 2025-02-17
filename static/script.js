@@ -4,13 +4,13 @@
  */
 document.addEventListener("DOMContentLoaded", function () {
     try {
-        fetchPortfolioData(); // Always fetch data once when the page loads
-
-        checkMarketStatus(); // Start checking market status periodically
+      fetchPortfolioData(); // Initial fetch
+      checkMarketStatus(); // This will start periodic fetching if market is open
     } catch (error) {
-        console.error("Error during initialization:", error);
+      console.error("Error during initialization:", error);
     }
-});
+  });
+  
 
 const API_KEY = "joel09-02-2024Adh";
 let periodicFetchActive = false; // Flag to track if periodic fetching is active
@@ -54,37 +54,35 @@ function isMarketOpen() {
  */
 function checkMarketStatus() {
     const marketOpen = isMarketOpen();
-
+  
     if (marketOpen && !periodicFetchActive) {
-        periodicFetchActive = true;
-        startPeriodicFetch();
-    } else if (!marketOpen && periodicFetchActive) {
-        periodicFetchActive = false;
-    } 
-
-    // Recheck market status every 1 minute
-    setTimeout(checkMarketStatus, 1 * 60 * 1000); // 1 minute
-}
+      periodicFetchActive = true;
+      startPeriodicFetch();
+    }
+    
+    // Recheck market status every minute
+    setTimeout(checkMarketStatus, 1 * 60 * 1000);
+  }
+  
 
 /**
  * Starts periodic fetching of portfolio data.
  */
 function startPeriodicFetch() {
-    const periodicFetch = async () => {
-        if (!isMarketOpen()) {
-            console.log("Market has closed during periodic fetch. Stopping further execution.");
-            periodicFetchActive = false;
-            return; // Stop fetching data if the market is closed
-        }
-
-        await fetchPortfolioData();
-        if (periodicFetchActive) {
-            setTimeout(periodicFetch, 3000); // Schedule next fetch
-        }
-    };
-
-    periodicFetch(); // Start the first periodic fetch
-}
+    // Use setInterval to call fetchPortfolioData every 3 seconds
+    const intervalId = setInterval(async () => {
+      // If the market is closed, clear the interval to stop fetching.
+      if (!isMarketOpen()) {
+        clearInterval(intervalId);
+        periodicFetchActive = false;
+        console.log("Market closed. Stopping periodic fetch.");
+        return;
+      }
+  
+      await fetchPortfolioData();
+    }, 3000);
+  }
+  
 
 /**
  * Fetches the portfolio data from the API and updates the relevant sections of the page.
