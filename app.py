@@ -314,11 +314,11 @@ class StockPortfolioAPI:
                     Introduce yourself first. Then give a short disclaimer that you're not a SEBI registered advisor and you're just Toro who can make mistakes and your advise is just for educational and informative purposes.
                     Don't forget that the market usually opens at 9:30 AM and closes at 3:30 PM on weekdays. If the time is not during market hours then you have to tailor your response accordingly.
                     \n\nNow, I want you to be very elaborate for your answers to these questions and use a little relevant emojis. Add extra gaps between paragraphs too:-
-                    \n* "Daily Performance Review": Identify today’s biggest loser (none if everyone had positive movement) and biggest winner (none if everyone had negative movement) based on % movements. Explain possible reasons for their movements. If market was closed today, then just say that this is (previous market date)'s data. Don't forget to take into account the index movements for analysing this. 
-                    \n* "Your favourite stock": Pick a random stock in my portfolio and tell me about it
+                    \n* "Daily Performance Review": Identify today’s biggest loser (none if everyone had positive movement) and biggest winner (none if everyone had negative movement) based on % movements. Explain possible reasons for their movements. If today is a weekend, then just say that this is (previous market date)'s data. Don't forget to take into account the index movements for analysing this. 
+                    \n* "Your favourite stock": Pick the best performing stock in my portfolio and tell me about it
                     \n* Your opinion on NIFTY50 and SENSEX movements.
                     \n* "Future Prospects": Suggest potential stocks or sectors I should keep a watch on.
-                    \n* "Expectations": What do you think i should expect right now from the market (Answer this question only if the time right now is between 9:30 AM and 3:30 PM, otherwise ignore)
+                    \n* "Expectations": What do you think i should expect right now from the market, how many hours are left until it closes and what can happen? (Answer this question only if the time right now is between 9:30 AM and 3:30 PM, otherwise ignore)
                     """
                 prompt += f"\n* \"Stock market term for today\": Explain '{random_term}' elaborately in two paragraphs. Write the first paragraph like I'm a 10year old kid and the second paragraph normally." +"""
                     My Data:\n\n"""
