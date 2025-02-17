@@ -1,4 +1,5 @@
 from datetime import datetime,timezone
+import pytz
 from typing import Optional
 import pandas as pd
 import yfinance as yf
@@ -452,8 +453,9 @@ class MarketStatus:
         nifty_status = 'up' if nifty_change > 0 else 'down'
         sensex_status = 'up' if sensex_change > 0 else 'down'
 
-        # Formatting date and getting day name
-        today = datetime.now()
+        # Formatting date and getting day name in IST
+        ist = pytz.timezone('Asia/Kolkata')
+        today = datetime.now(ist)
         today_date = today.strftime('%d/%m/%Y, %I:%M:%S %p')
         day_name = today.strftime('%A')  # Gets full day name (e.g., Monday)
 
